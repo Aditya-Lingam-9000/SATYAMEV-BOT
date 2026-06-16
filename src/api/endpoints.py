@@ -258,6 +258,8 @@ def create_router() -> APIRouter:
         Body: str = Form(default=""),
         MediaUrl0: str = Form(default=None),
         MediaContentType0: str = Form(default=None),
+        MessageSid: str = Form(default=None),
+        SmsSid: str = Form(default=None),
     ):
         """
         WhatsApp webhook endpoint for Twilio integration.
@@ -317,11 +319,12 @@ def create_router() -> APIRouter:
                 message=msg,
                 whatsapp_handler=whatsapp_handler,
                 config=config,
+                message_sid=MessageSid or SmsSid,
             )
             
             # Return empty TwiML response (we send updates via Twilio REST client in background)
             twiml = MessagingResponse()
-            logger.info(f"Acknowledged message from {From}, processing in background with live updates")
+            logger.info(f"Acknowledged message from {From}, processing in background")
             return twiml.to_xml()
         
         except Exception as e:
@@ -348,7 +351,7 @@ def set_twilio_client(client):
     logger.info("Twilio client configured")
 
 
-async def process_whatsapp_message(user_phone: str, message, whatsapp_handler, config=None):
+async def process_whatsapp_message(user_phone: str, message, whatsapp_handler, config=None, message_sid: str = None):
     """
     Background task: Process WhatsApp message through full pipeline.
     
@@ -357,7 +360,7 @@ async def process_whatsapp_message(user_phone: str, message, whatsapp_handler, c
     from twilio.rest import Client
     
     try:
-        logger.info(f"Background processing started for {user_phone}")
+        logger.info(f"Background processing started for {user_phone} (message_sid={message_sid})")
         
         # Initialize Twilio client for sending response
         if config is None:
@@ -374,23 +377,28 @@ async def process_whatsapp_message(user_phone: str, message, whatsapp_handler, c
         
         client = Client(account_sid, auth_token)
         
-        # Send initial status message (plain text, no emojis)
-        status_msg = client.messages.create(
+        # Send initial status receipt message
+        client.messages.create(
             from_=twilio_phone,
-            body="Processing claim...\n[██░░░░░░░░] 20%",
+            body="🔍 Satyamev-Bot is now verifying your claim. Please wait a moment...",
             to=user_phone,
         )
-        status_sid = status_msg.sid
         
-        # Define status callback function to edit the message
+        # Define status callback function to send native WhatsApp typing indicator
         def update_status(text: str, percent: int):
-            try:
-                bars = int(percent / 10)
-                progress_bar = "[" + "█" * bars + "░" * (10 - bars) + "]"
-                new_body = f"{text}...\n{progress_bar} {percent}%"
-                client.messages(status_sid).update(body=new_body)
-            except Exception as update_err:
-                logger.warning(f"Could not update status message: {update_err}")
+            logger.info(f"Pipeline status update [{percent}%]: {text}")
+            if message_sid:
+                try:
+                    url = "https://messaging.twilio.com/v3/Indicators/Typing.json"
+                    import requests
+                    requests.post(
+                        url,
+                        data={"messageId": message_sid, "channel": "whatsapp"},
+                        auth=(account_sid, auth_token),
+                        timeout=3
+                    )
+                except Exception as indicator_err:
+                    logger.debug(f"Failed to send typing indicator: {indicator_err}")
 
         # Process message through pipeline with status updates
         result = whatsapp_handler.process_message(message, status_callback=update_status)
@@ -400,13 +408,13 @@ async def process_whatsapp_message(user_phone: str, message, whatsapp_handler, c
         response_text = WhatsAppFormatter.format_verdict_message(result)
         
         # Send response message
-        message = client.messages.create(
+        message_sent = client.messages.create(
             from_=twilio_phone,
             body=response_text,
             to=user_phone,
         )
         
-        logger.info(f"Response sent to {user_phone}: {message.sid}")
+        logger.info(f"Response sent to {user_phone}: {message_sent.sid}")
         
         # Send card image if available (as separate message)
         if result.get("card_bytes"):
