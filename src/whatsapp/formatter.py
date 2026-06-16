@@ -97,6 +97,66 @@ class WhatsAppFormatter:
             "ingest_failed_desc": "आम्ही आपल्या विनंतीवर प्रक्रिया करू शकलो नाही:",
             "ingest_failed_bullets": "कृपया पुन्हा प्रयत्न करा:\n• एक मजकूर दावा\n• एक स्क्रीनशॉट किंवा प्रतिमा\n• एक व्हॉइस संदेश"
         },
+        "gujarati": {
+            "verdict_title": "ચુકાદો",
+            "confidence": "વિશ્વાસનું સ્તર",
+            "analysis": "વિશ્લેષણ",
+            "supporting_evidence": "સહાયક પુરાવા",
+            "verified_sources": "સત્યાપિત સ્ત્રોતો",
+            "footer_title": "સત્યમેવ-બોટ દ્વારા ફેક્ટ-ચેક",
+            "footer_sub": "AI અને વિશ્વસનીય સ્ત્રોતો દ્વારા સંચાલિત",
+            "ingest_failed": "ફેક્ટ-ચેક નિષ્ફળ",
+            "ingest_failed_desc": "અમે તમારી વિનંતી પર પ્રક્રિયા કરી શક્યા નથી:",
+            "ingest_failed_bullets": "કૃપા કરીને ફરીથી પ્રયાસ કરો:\n• ટેક્સ્ટ દાવો\n• સ્ક્રીનશોટ અથવા છબી\n• વૉઇસ સંદેશ"
+        },
+        "urdu": {
+            "verdict_title": "فیصلہ",
+            "confidence": "اعتماد کی سطح",
+            "analysis": "تجزیہ",
+            "supporting_evidence": "معاون ثبوت",
+            "verified_sources": "تصدیق شدہ ذرائع",
+            "footer_title": "ستیہ میو بوٹ کے ذریعے فیکٹ چیک",
+            "footer_sub": "مصنوعی ذہانت اور قابل اعتماد ذرائع سے لیس",
+            "ingest_failed": "فیکٹ چیک ناکام ہو گیا",
+            "ingest_failed_desc": "ہم آپ کی درخواست پر کارروائی نہیں کر سکے:",
+            "ingest_failed_bullets": "براہ کرم دوبارہ کوشش کریں:\n• ایک ٹیکسٹ دعویٰ\n• ایک اسکرین شاٹ یا تصویر\n• ایک صوتی پیغام"
+        },
+        "kannada": {
+            "verdict_title": "ತೀರ್ಪು",
+            "confidence": "ವಿಶ್ವಾಸಾರ್ಹತೆಯ ಮಟ್ಟ",
+            "analysis": "ವಿಶ್ಲೇಷಣೆ",
+            "supporting_evidence": "ಪೂರಕ ಪುರಾವೆಗಳು",
+            "verified_sources": "ಪರಿಶೀಲಿಸಿದ ಮೂಲಗಳು",
+            "footer_title": "ಸತ್ಯಮೇವ್-ಬಾಟ್ ಮೂಲಕ ಫ್ಯಾಕ್ಟ್-ಚೆಕ್",
+            "footer_sub": "AI ಮತ್ತು ವಿಶ್ವಾಸಾರ್ಹ ಮೂಲಗಳಿಂದ ನಡೆಸಲ್ಪಡುತ್ತದೆ",
+            "ingest_failed": "ಕಡತ ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ",
+            "ingest_failed_desc": "ನಿಮ್ಮ ವಿನಂತಿಯನ್ನು ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲು ನಮಗೆ ಸಾಧ್ಯವಾಗಲಿಲ್ಲ:",
+            "ingest_failed_bullets": "ದಯವಿಟ್ಟು ಇವುಗಳೊಂದಿಗೆ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ:\n• ಪಠ್ಯ ಹಕ್ಕು\n• ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಅಥವಾ ಚಿತ್ರ\n• ಧ್ವನಿ ಸಂದೇಶ"
+        },
+        "odia": {
+            "verdict_title": "ନିଷ୍ପତ୍ତି",
+            "confidence": "ବିଶ୍ୱାସର ସ୍ତର",
+            "analysis": "ବିଶ୍ଳେଷଣ",
+            "supporting_evidence": "ସହାୟକ ପ୍ରମାଣ",
+            "verified_sources": "ଯାଞ୍ચ ହୋଇଥିବା ଉତ୍ସ",
+            "footer_title": "ସତ୍ୟମେବ-ବଟ୍ ଦ୍ୱାରା ତଥ୍ୟ ଯାଞ୍ಚ",
+            "footer_sub": "AI ଏବଂ ବିଶ୍ୱାସଯୋગ୍ୟ ଉତ୍ସ ଦ୍ୱାରା ଚାଳିତ",
+            "ingest_failed": "ତଥ୍ୟ ଯାଞ୍ಚ ବିଫଳ ହେଲା",
+            "ingest_failed_desc": "ଆମେ ଆପڻଙ୍କ ଅନຸରୋଧ ପ୍ରକ୍ରିୟାକରଣ କରିପାରିଲୁ ନାହିଁ:",
+            "ingest_failed_bullets": "ଦୟାକରି ପୁଣિ ଚେଷ୍ଟା କରନ୍ତു:\n• ଏକ ଲେଖା ଦାବି\n• ଏକ ସ୍କ୍ରିନସଟ୍ କିମ୍ବା ଛବି\n• ଏକ ସ୍ୱର ବାର୍ତ୍ତା"
+        },
+        "malayalam": {
+            "verdict_title": "തീർപ്പ്",
+            "confidence": "വിശ്വാസ്യതയുടെ നിലവാരം",
+            "analysis": "വിശകലനം",
+            "supporting_evidence": "സഹായകരമായ തെളിവുകൾ",
+            "verified_sources": "സ്ഥിരീകരിച്ച ഉറവിടങ്ങൾ",
+            "footer_title": "സത്യമേവ്-ബോട്ട് വഴിയുള്ള വസ്തുതാ പരിശോധന",
+            "footer_sub": "AI-യും വിശ്വസനീയമായ ഉറവിടങ്ങളും അടിസ്ഥാനമാക്കിയത്",
+            "ingest_failed": "വസ്തുതാ പരിശോധന പരാജയപ്പെട്ടു",
+            "ingest_failed_desc": "നിങ്ങളുടെ അഭ്യർത്ഥന പ്രോസസ്സ് ചെയ്യാൻ ഞങ്ങൾക്ക് കഴിഞ്ഞില്ല:",
+            "ingest_failed_bullets": "ദയവായി താഴെ പറയുന്നവ ഉപയോഗിച്ച് വീണ്ടും ശ്രമിക്കുക:\n• ഒരു വാചക ക്ലെയിം\n• ഒരു സ്ക്രീൻഷോട്ട് അല്ലെങ്കിൽ ചിത്രം\n• ഒരു ശബ്ദ സന്ദേശം"
+        },
         "bengali": {
             "verdict_title": "রায়",
             "confidence": "বিশ্বাসের স্তর",
@@ -142,6 +202,36 @@ class WhatsAppFormatter:
             "MISLEADING": "दिशाभूल करणारे (MISLEADING)",
             "UNVERIFIABLE": "पडताळणी न झालेले (UNVERIFIABLE)",
         },
+        "gujarati": {
+            "TRUE": "સાચું (TRUE)",
+            "FALSE": "ખોટું (FALSE)",
+            "MISLEADING": "ભ્રામક (MISLEADING)",
+            "UNVERIFIABLE": "ચકાસી ન શકાય તેવું (UNVERIFIABLE)",
+        },
+        "urdu": {
+            "TRUE": "سچ (TRUE)",
+            "FALSE": "جھوٹ (FALSE)",
+            "MISLEADING": "گمراہ کن (MISLEADING)",
+            "UNVERIFIABLE": "تصدیق ناممکن (UNVERIFIABLE)",
+        },
+        "kannada": {
+            "TRUE": "ನಿಜ (TRUE)",
+            "FALSE": "ಸುಳ್ಳು (FALSE)",
+            "MISLEADING": "ದಾರಿ ತಪ್ಪಿಸುವ (MISLEADING)",
+            "UNVERIFIABLE": "ಪರಿಶೀಲಿಸಲಾಗದ (UNVERIFIABLE)",
+        },
+        "odia": {
+            "TRUE": "ସତ୍ୟ (TRUE)",
+            "FALSE": "ମିଥ୍ୟା (FALSE)",
+            "MISLEADING": "ଭ୍ରମାତ୍ମକ (MISLEADING)",
+            "UNVERIFIABLE": "ଯାଞ୍চ ଅସମ୍ଭବ (UNVERIFIABLE)",
+        },
+        "malayalam": {
+            "TRUE": "ശരി (TRUE)",
+            "FALSE": "തെറ്റ് (FALSE)",
+            "MISLEADING": "തെറ്റിദ്ധരിപ്പിക്കുന്നത് (MISLEADING)",
+            "UNVERIFIABLE": "സ്ഥിരീകരിക്കാൻ കഴിയാത്തത് (UNVERIFIABLE)",
+        },
         "bengali": {
             "TRUE": "সত্য (TRUE)",
             "FALSE": "মিথ্যা (FALSE)",
@@ -165,6 +255,16 @@ class WhatsAppFormatter:
             return "marathi"
         elif "bengali" in lang_lower or lang_lower == "bn":
             return "bengali"
+        elif "gujarati" in lang_lower or lang_lower == "gu":
+            return "gujarati"
+        elif "urdu" in lang_lower or lang_lower == "ur":
+            return "urdu"
+        elif "kannada" in lang_lower or lang_lower == "kn":
+            return "kannada"
+        elif "odia" in lang_lower or lang_lower == "or":
+            return "odia"
+        elif "malayalam" in lang_lower or lang_lower == "ml":
+            return "malayalam"
         return "english"
 
     @staticmethod
