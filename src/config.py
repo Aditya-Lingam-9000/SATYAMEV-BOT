@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     # ============================================
     # LOCAL CONFIGURATION
     # ============================================
+    IMAGE_ENGINE: str = Field(default="gemini", description="Primary OCR engine (easyocr or gemini)")
     OCR_LANGUAGES: str = Field(default="en,hi,te,ta,mr,bn", description="EasyOCR languages (comma-separated)")
     MAX_UPLOAD_SIZE_MB: int = Field(default=50, description="Maximum file upload size in MB")
     TEMP_DIR: str = Field(default="./temp", description="Temporary files directory")

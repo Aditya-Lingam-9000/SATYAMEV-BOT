@@ -42,7 +42,7 @@ class ImageHandler:
     MIN_CONFIDENCE = 0.3  # EasyOCR confidence threshold
     
     def __init__(self, 
-                 primary_engine: Literal["easyocr", "gemini"] = "easyocr",
+                 primary_engine: Literal["easyocr", "gemini"] = "gemini",
                  google_api_key: Optional[str] = None,
                  languages: Optional[List[str]] = None):
         """

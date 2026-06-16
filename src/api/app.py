@@ -36,7 +36,7 @@ async def lifespan(app: FastAPI):
         ingestion_manager = IngestionManager(
             groq_api_key=config.GROQ_API_KEY,
             google_api_key=config.GOOGLE_API_KEY,
-            image_engine="easyocr",
+            image_engine=config.IMAGE_ENGINE,
         )
         logger.info("Ingestion manager initialized")
     except Exception as e:

@@ -42,7 +42,7 @@ class IngestionManager:
     def __init__(self, 
                  groq_api_key: Optional[str] = None,
                  google_api_key: Optional[str] = None,
-                 image_engine: Literal["easyocr", "gemini"] = "easyocr"):
+                 image_engine: Literal["easyocr", "gemini"] = "gemini"):
         """
         Initialize IngestionManager with API keys.
         

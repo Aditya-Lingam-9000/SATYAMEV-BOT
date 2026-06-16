@@ -129,9 +129,9 @@ def test_image_handler():
     print_subheader("TEST 3: IMAGE HANDLER")
     
     try:
-        # Try EasyOCR first (always available)
-        handler = ImageHandler(primary_engine="easyocr", google_api_key=None)
-        print("[PASS] ImageHandler initialized (EasyOCR primary engine)")
+        # Try configured primary engine first
+        handler = ImageHandler(primary_engine=settings.IMAGE_ENGINE, google_api_key=settings.GOOGLE_API_KEY)
+        print("[PASS] ImageHandler initialized ({} primary engine)".format(settings.IMAGE_ENGINE))
         
         # Test validation with non-existent file
         print("\n3.1: Validation test (non-existent file)")
@@ -165,7 +165,7 @@ def test_ingestion_manager():
         manager = IngestionManager(
             groq_api_key=groq_key,
             google_api_key=google_key,
-            image_engine="easyocr"
+            image_engine=settings.IMAGE_ENGINE
         )
         print("[PASS] IngestionManager initialized")
         
@@ -201,7 +201,7 @@ def test_end_to_end():
     manager = IngestionManager(
         groq_api_key=groq_key,
         google_api_key=google_key,
-        image_engine="easyocr"
+        image_engine=settings.IMAGE_ENGINE
     )
     
     # Test claims
