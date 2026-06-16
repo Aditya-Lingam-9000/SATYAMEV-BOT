@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Live | Satyamev-Bot Sandbox Instructions</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="glow-blur-1"></div>
+    <div class="glow-blur-2"></div>
+
+    <!-- Sticky Glassmorphic Header -->
+    <header class="header-glass">
+      <nav class="nav-container">
+        <a href="index.html" class="brand">
+          <img src="assets/logo.png" alt="Satyamev-Bot Logo" class="brand-img" id="nav-logo">
+          <span class="brand-text">Satyamev-Bot</span>
+        </a>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-item">Home</a></li>
+          <li><a href="index.html#features" class="nav-item">Features</a></li>
+          <li><a href="index.html#how-to-use" class="nav-item">How to Use</a></li>
+          <li><a href="test.html" class="btn-primary active" id="btn-nav-test">Test Live</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Interactive Test Area Layout -->
+    <main class="section-wrapper">
+      <div class="test-layout">
+        
+        <!-- Left Side: Interactive Step-by-Step Instructions -->
+        <div class="instruction-container">
+          <span class="hero-tag">Live Testing Sandbox</span>
+          <h2 style="font-size: 2.2rem; margin-bottom: 0.5rem;">How to Test the <span>Satyamev-Bot</span></h2>
+          <p style="margin-bottom: 2rem;">Follow these sandbox setup instructions to test fact-checking directly on your device.</p>
+          
+          <!-- Tab Navigation -->
+          <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('text')">Text Claims</button>
+            <button class="tab-btn" onclick="switchTab('image')">Image OCR</button>
+            <button class="tab-btn" onclick="switchTab('audio')">Voice Notes</button>
+          </div>
+
+          <!-- Tab Content 1: Text -->
+          <div id="tab-text" class="tab-content active">
+            <ul class="instruction-step-list">
+              <li class="instruction-step">
+                <div class="step-badge">1</div>
+                <div class="step-content">
+                  <h4>Connect to the Sandbox</h4>
+                  <p>Open WhatsApp and send the following activation text to the Twilio sandbox number: <strong>+1 415 523 8886</strong>.</p>
+                  <div class="code-box">
+                    <span class="code-text" id="code-sandbox-text">join sandbox-code</span>
+                    <button class="copy-btn" onclick="copyText('code-sandbox-text')">Copy Code</button>
+                  </div>
+                </div>
+              </li>
+              <li class="instruction-step">
+                <div class="step-badge">2</div>
+                <div class="step-content">
+                  <h4>Send a Claim Text</h4>
+                  <p>Copy and paste any rumor or questionable news text (in English, Hindi, Telugu, etc.) to the chat.</p>
+                </div>
+              </li>
+              <li class="instruction-step">
+                <div class="step-badge">3</div>
+                <div class="step-content">
+                  <h4>Review Live Fact-Check</h4>
+                  <p>Wait for the live progress bar to reach 100% and check the fully formatted verdict details returned.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Tab Content 2: Image -->
+          <div id="tab-image" class="tab-content">
+            <ul class="instruction-step-list">
+              <li class="instruction-step">
+                <div class="step-badge">1</div>
+                <div class="step-content">
+                  <h4>Join the Session</h4>
+                  <p>Send the sandbox keyword text to establish connection (skip if already joined).</p>
+                </div>
+              </li>
+              <li class="instruction-step">
+                <div class="step-badge">2</div>
+                <div class="step-content">
+                  <h4>Upload a Screenshot</h4>
+                  <p>Send an image screenshot of a WhatsApp forward, social media post, or news card containing a claim.</p>
+                </div>
+              </li>
+              <li class="instruction-step">
+                <div class="step-badge">3</div>
+                <div class="step-content">
+                  <h4>OCR Text Extraction</h4>
+                  <p>The backend automatically runs Gemini Vision/OCR to extract the text content and verifies it against active news engines.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Tab Content 3: Audio -->
+          <div id="tab-audio" class="tab-content">
+            <ul class="instruction-step-list">
+              <li class="instruction-step">
+                <div class="step-badge">1</div>
+                <div class="step-content">
+                  <h4>Connect to Sandbox</h4>
+                  <p>Verify you are connected to the Twilio Sandbox session by sending the join code.</p>
+                </div>
+              </li>
+              <li class="instruction-step">
+                <div class="step-badge">2</div>
+                <div class="step-content">
+                  <h4>Record or Send a Voice Note</h4>
+                  <p>Record a spoken claim on WhatsApp or send an audio file (e.g. .mp3, .ogg, .wav) in any of the 9 supported regional languages.</p>
+                </div>
+              </li>
+              <li class="instruction-step">
+                <div class="step-badge">3</div>
+                <div class="step-content">
+                  <h4>Automated Audio Transcription</h4>
+                  <p>The bot transcribes the speech to text using Groq Whisper, determines the native language, and processes the fact-check.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Direct Deep Link Button -->
+          <div style="margin-top: 3rem;">
+            <a href="https://wa.me/14155238886?text=join%20sandbox-code" class="btn-primary" style="display: flex; justify-content: center; width: 100%;" id="whatsapp-direct-link" target="_blank">
+              📲 Launch Chat on WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Side: Animated Smartphone Mockup Chat Simulator -->
+        <div>
+          <div class="phone-mockup">
+            <div class="phone-screen">
+              <div class="phone-header">
+                <div class="phone-avatar"></div>
+                <div class="phone-user-info">
+                  <span class="phone-username">Satyamev-Bot</span>
+                  <span class="phone-status" id="chat-bot-status">online</span>
+                </div>
+              </div>
+              
+              <!-- Chat Bubble Log Container -->
+              <div class="phone-body" id="chat-log">
+                <!-- Dynamically populated by app.js -->
+              </div>
+              
+              <div class="phone-footer">
+                <input type="text" class="phone-input" placeholder="Enter claim here..." disabled id="chat-input-field">
+                <button class="phone-send-btn">➔</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-wrap">
+      <p class="footer-text">&copy; 2026 Satyamev-Bot. Powering Trust and Consensus through Advanced AI Agents.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
