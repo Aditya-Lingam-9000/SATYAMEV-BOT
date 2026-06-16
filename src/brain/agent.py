@@ -290,6 +290,8 @@ INSTRUCTIONS:
 4. Provide a clear verdict with reasoning
 5. IMPORTANT: The "verdict" key value MUST be one of the English keys: "TRUE", "FALSE", "MISLEADING", or "UNVERIFIABLE".
 6. IMPORTANT: The "reasoning" and "key_evidence" text values MUST be written in the user's original language: {target_language}.
+7. IMPORTANT: The "reasoning" value MUST be a concise, complete analysis of exactly 3 to 4 sentences (~300 to 450 characters). The final sentence must be fully written out and end with a period. Do not truncate the output with dots.
+8. IMPORTANT: The "key_evidence" array MUST contain exactly 3 to 5 items max. Each item must be a single, complete sentence.
 
 REQUIRED RESPONSE FORMAT (JSON):
 {{

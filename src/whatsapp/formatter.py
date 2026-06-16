@@ -268,6 +268,19 @@ class WhatsAppFormatter:
         return "english"
 
     @staticmethod
+    def _extract_domain(url: str) -> str:
+        """Extract clean domain name from URL."""
+        from urllib.parse import urlparse
+        try:
+            parsed = urlparse(url)
+            domain = parsed.netloc
+            if domain.startswith("www."):
+                domain = domain[4:]
+            return domain
+        except Exception:
+            return "Source Link"
+
+    @staticmethod
     def format_verdict_message(result: Dict) -> str:
         """
         Format verification result as WhatsApp message.
@@ -317,36 +330,37 @@ class WhatsAppFormatter:
         message_lines.append(f"*{templates['confidence']}:* {confidence_bars} {confidence:.0%}")
         message_lines.append("")
         
-        # Detailed Reasoning (medium length ~400-500 chars)
-        reasoning_text = reasoning[:450] + "..." if len(reasoning) > 450 else reasoning
-        message_lines.append(f"*{templates['analysis']}:*")
-        message_lines.append(reasoning_text)
+        # Detailed Reasoning (No programmatic truncation, print full LLM-controlled text)
+        message_lines.append(f"*{templates['analysis'].upper()}*")
+        message_lines.append(reasoning.strip())
         message_lines.append("")
         
-        # Key evidence (4-5 points)
+        # Key evidence (Clamped to 4-5 points max, bulleted)
         if key_evidence:
-            message_lines.append(f"*{templates['supporting_evidence']}:*")
-            # Display 4-5 evidence points
-            for i, evidence in enumerate(key_evidence[:5], 1):
-                # Keep more text per evidence point (100 chars instead of 80)
-                evidence_text = evidence[:120] + "..." if len(evidence) > 120 else evidence
-                message_lines.append(f"{i}. {evidence_text}")
+            message_lines.append(f"*{templates['supporting_evidence'].upper()}*")
+            # Display up to 5 evidence points max
+            for evidence in key_evidence[:5]:
+                message_lines.append(f"• {evidence.strip()}")
             message_lines.append("")
         
-        # Sources (3-4 URLs)
+        # Sources (Cleanly formatted with domain name on top and raw URL below it, in reverse relevance order)
         if sources:
-            message_lines.append(f"*{templates['verified_sources']}:*")
-            source_count = min(4, len(sources))  # Show 3-4 sources
-            for i, source in enumerate(sources[:source_count], 1):
-                # Cleaner URL display
-                source_display = source[:60] + "..." if len(source) > 60 else source
-                message_lines.append(f"{i}. {source_display}")
+            message_lines.append(f"*{templates['verified_sources'].upper()}*")
+            source_count = min(4, len(sources))
+            # Reverse order so the most relevant (first) source is printed at the bottom
+            reversed_sources = list(reversed(sources[:source_count]))
+            for i, source in enumerate(reversed_sources, 1):
+                domain = WhatsAppFormatter._extract_domain(source)
+                message_lines.append(f"{i}. {domain}")
+                message_lines.append(f"{source}")
+                if i < len(reversed_sources):
+                    message_lines.append("")  # Blank line separator between sources
             message_lines.append("")
         
         # Professional footer
         message_lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        message_lines.append(templates['footer_title'])
-        message_lines.append(templates['footer_sub'])
+        message_lines.append(f"_{templates['footer_title']}_")
+        message_lines.append(f"_{templates['footer_sub']}_")
         
         return "\n".join(message_lines)
     
