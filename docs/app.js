@@ -77,7 +77,7 @@ const chatScenarios = {
     { type: 'status', text: 'Processing claim', percent: 20 },
     { type: 'status', text: 'Searching web databases', percent: 60 },
     { type: 'status', text: 'Analyzing evidence', percent: 100 },
-    { type: 'received', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n❌ *VERDICT: FALSE*\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n*CONFIDENCE:* 98%\n\n*ANALYSIS*\nNASA\'s Planetary Defense Coordination Office has confirmed that there are no asteroids on a collision course with Earth tomorrow. The viral post is entirely fabricated.\n\n*SUPPORTING EVIDENCE*\n• NASA\'s database lists all near-Earth object trajectories, confirming zero threats.\n• Leading astronomical observatories report no unusual orbital movements.\n\n*VERIFIED SOURCES*\n1. nasa.gov\nhttps://nasa.gov' }
+    { type: 'received', text: '━━━━━━━━━━━━━━━\n❌ *VERDICT: FALSE*\n━━━━━━━━━━━━━━━\n\n*CONFIDENCE:* 98%\n\n*ANALYSIS*\nNASA\'s Planetary Defense Coordination Office has confirmed that there are no asteroids on a collision course with Earth tomorrow. The viral post is entirely fabricated.\n\n*SUPPORTING EVIDENCE*\n• NASA\'s database lists all near-Earth object trajectories, confirming zero threats.\n• Leading astronomical observatories report no unusual orbital movements.\n\n*VERIFIED SOURCES*\n1. nasa.gov\nhttps://nasa.gov' }
   ],
   image: [
     { type: 'sent', text: '📷 [Sent News Image Screenshot]' },
@@ -85,7 +85,7 @@ const chatScenarios = {
     { type: 'status', text: 'Extracting text content from claim', percent: 40 },
     { type: 'status', text: 'Searching trusted web databases', percent: 70 },
     { type: 'status', text: 'Analyzing evidence', percent: 100 },
-    { type: 'received', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n⚠️ *VERDICT: MISLEADING*\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n*CONFIDENCE:* 88%\n\n*ANALYSIS*\nThe screenshot claims that the government is issuing free smartphones to all citizens next month. This is a recurring scam link designed to steal user credentials. The official department has debunked this scheme.\n\n*SUPPORTING EVIDENCE*\n• The Press Information Bureau (PIB) issued a warning classifying the portal as a phishing link.\n\n*VERIFIED SOURCES*\n1. pib.gov.in\nhttps://pib.gov.in' }
+    { type: 'received', text: '━━━━━━━━━━━━━━━\n⚠️ *VERDICT: MISLEADING*\n━━━━━━━━━━━━━━━\n\n*CONFIDENCE:* 88%\n\n*ANALYSIS*\nThe screenshot claims that the government is issuing free smartphones to all citizens next month. This is a recurring scam link designed to steal user credentials. The official department has debunked this scheme.\n\n*SUPPORTING EVIDENCE*\n• The Press Information Bureau (PIB) issued a warning classifying the portal as a phishing link.\n\n*VERIFIED SOURCES*\n1. pib.gov.in\nhttps://pib.gov.in' }
   ],
   audio: [
     { type: 'sent', text: '🎙️ [Sent Voice Note (Telugu)]' },
@@ -93,7 +93,7 @@ const chatScenarios = {
     { type: 'status', text: 'Extracting text content from claim', percent: 45 },
     { type: 'status', text: 'Analyzing evidence and synthesizing verdict', percent: 80 },
     { type: 'status', text: 'Fact-check report compiled', percent: 100 },
-    { type: 'received', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n✅ *తీర్పు: నిజం (TRUE)*\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n*విశ్వాసార్హత స్థాయి:* 92%\n\n*ವಿಶ್ಲೇಷಣೆ*\nఈ వైరల్ ఆడియోలో పేర్కొన్నట్లుగా, రిజర్వ్ బ్యాంక్ కొత్త సెక్యూరిటీ నిబంధనలను విడుదల చేసిన మాట వాస్తవం. కొత్త గైడ్‌లైన్స్ అధికారిక నోటిఫికేషన్ ద్వారా ధృవీకరించబడ్డాయి.\n\n*సహాయక సాక్ష్యాలు*\n• RBI అధికారిక వెబ్‌సైట్ జూన్ 15 తేదీతో ప్రెస్ రిలీజ్ విడుదల చేసింది.\n\n*ధృవీకరించబడిన మూలాలు*\n1. rbi.org.in\nhttps://rbi.org.in' }
+    { type: 'received', text: '━━━━━━━━━━━━━━━\n✅ *తీర్పు: నిజం (TRUE)*\n━━━━━━━━━━━━━━━\n\n*విశ్వాసార్హత స్థాయి:* 92%\n\n*ವಿಶ್ಲೇಷಣೆ*\nఈ వైరల్ ఆడియోలో పేర్కొన్నట్లుగా, రిజర్వ్ బ్యాంక్ కొత్త సెక్యూరిటీ నిబంధనలను విడుదల చేసిన మాట వాస్తవం. కొత్త గైడ్‌లైన్స్ అధికారిక నోటిఫికేషన్ ద్వారా ధృవీకరించబడ్డాయి.\n\n*సహాయక సాక్ష్యాలు*\n• RBI అధికారిక వెబ్‌సైట్ జూన్ 15 తేదీతో ప్రెస్ రిలీజ్ విడుదల చేసింది.\n\n*ధృవీకరించబడిన మూలాలు*\n1. rbi.org.in\nhttps://rbi.org.in' }
   ]
 };
 
