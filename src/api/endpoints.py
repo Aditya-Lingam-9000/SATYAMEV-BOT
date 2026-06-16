@@ -319,13 +319,9 @@ def create_router() -> APIRouter:
                 config=config,
             )
             
-            # Return immediate acknowledgment
-            from src.whatsapp.formatter import WhatsAppFormatter
+            # Return empty TwiML response (we send updates via Twilio REST client in background)
             twiml = MessagingResponse()
-            twiml.message(WhatsAppFormatter.format_acknowledgment_message())
-            
-            logger.info(f"Acknowledged message from {From}, processing in background")
-            
+            logger.info(f"Acknowledged message from {From}, processing in background with live updates")
             return twiml.to_xml()
         
         except Exception as e:
@@ -363,13 +359,6 @@ async def process_whatsapp_message(user_phone: str, message, whatsapp_handler, c
     try:
         logger.info(f"Background processing started for {user_phone}")
         
-        # Process message through pipeline
-        result = whatsapp_handler.process_message(message)
-        
-        # Format response
-        from src.whatsapp.formatter import WhatsAppFormatter
-        response_text = WhatsAppFormatter.format_verdict_message(result)
-        
         # Initialize Twilio client for sending response
         if config is None:
             from src.config import Settings
@@ -384,6 +373,31 @@ async def process_whatsapp_message(user_phone: str, message, whatsapp_handler, c
             return
         
         client = Client(account_sid, auth_token)
+        
+        # Send initial status message (plain text, no emojis)
+        status_msg = client.messages.create(
+            from_=twilio_phone,
+            body="Processing claim...\n[██░░░░░░░░] 20%",
+            to=user_phone,
+        )
+        status_sid = status_msg.sid
+        
+        # Define status callback function to edit the message
+        def update_status(text: str, percent: int):
+            try:
+                bars = int(percent / 10)
+                progress_bar = "[" + "█" * bars + "░" * (10 - bars) + "]"
+                new_body = f"{text}...\n{progress_bar} {percent}%"
+                client.messages(status_sid).update(body=new_body)
+            except Exception as update_err:
+                logger.warning(f"Could not update status message: {update_err}")
+
+        # Process message through pipeline with status updates
+        result = whatsapp_handler.process_message(message, status_callback=update_status)
+        
+        # Format response
+        from src.whatsapp.formatter import WhatsAppFormatter
+        response_text = WhatsAppFormatter.format_verdict_message(result)
         
         # Send response message
         message = client.messages.create(

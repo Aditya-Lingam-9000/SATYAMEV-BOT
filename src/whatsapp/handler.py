@@ -198,12 +198,13 @@ class WhatsAppHandler:
             logger.error(error_msg)
             return None, error_msg
     
-    def process_message(self, message: WhatsAppMessage) -> Dict:
+    def process_message(self, message: WhatsAppMessage, status_callback=None) -> Dict:
         """
         Process WhatsApp message through complete pipeline.
         
         Args:
             message: WhatsAppMessage object
+            status_callback: Optional callback function(text, percent) to report progress
         
         Returns:
             Dict with verdict, reasoning, sources, card_bytes
@@ -222,6 +223,8 @@ class WhatsAppHandler:
         try:
             # Step 1: Determine input source (text or media)
             if message.media_url and message.media_type:
+                if status_callback:
+                    status_callback("Downloading media file", 15)
                 # Download media from Twilio to local temp storage
                 local_path = self._download_twilio_media(message.media_url, message.media_type)
                 if not local_path:
@@ -238,6 +241,9 @@ class WhatsAppHandler:
                 return result
             
             logger.info(f"Processing {input_type} input from {message.user_phone}")
+            
+            if status_callback:
+                status_callback("Extracting text content from claim", 30)
             
             # Step 2: Ingest claim
             if not self.ingestion_manager:
@@ -261,10 +267,16 @@ class WhatsAppHandler:
             
             logger.info(f"Extracted text: {text[:100]}")
             
+            if status_callback:
+                status_callback("Searching trusted web databases and consensus", 55)
+            
             # Step 3: Verify claim
             if not self.fact_checking_agent:
                 result["error"] = "Verification service not available"
                 return result
+            
+            if status_callback:
+                status_callback("Analyzing evidence and synthesizing verdict", 75)
             
             verdict_result = self.fact_checking_agent.verify_claim(text)
             
@@ -279,6 +291,8 @@ class WhatsAppHandler:
             
             # Step 4: Generate visual card
             if self.card_generator:
+                if status_callback:
+                    status_callback("Rendering final visual verdict card", 90)
                 try:
                     generator = self.card_generator.__class__(
                         preset="instagram",  # Square for WhatsApp
@@ -299,6 +313,9 @@ class WhatsAppHandler:
                 
                 except Exception as e:
                     logger.warning(f"Card generation failed: {e}")
+            
+            if status_callback:
+                status_callback("Fact-check report compiled successfully", 100)
             
             result["success"] = True
             return result
