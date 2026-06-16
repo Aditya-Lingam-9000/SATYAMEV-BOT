@@ -88,7 +88,21 @@ class ImageHandler:
         try:
             import easyocr
             logger.info("Initializing EasyOCR reader for languages: {}...".format(self.languages))
-            self.easyocr_reader = easyocr.Reader(self.languages, gpu=False)
+            try:
+                self.easyocr_reader = easyocr.Reader(self.languages, gpu=False)
+            except Exception as e:
+                # EasyOCR does not allow mixing Tamil ('ta') script with Devanagari/Telugu/Bengali.
+                # If a compatibility exception occurs, fall back to initializing without Tamil.
+                if "Tamil" in str(e) or "compatibility" in str(e).lower():
+                    safe_languages = [lang for lang in self.languages if lang != "ta"]
+                    logger.warning(
+                        "EasyOCR script compatibility warning. Retrying with safe languages (excluding Tamil): {}".format(
+                            safe_languages
+                        )
+                    )
+                    self.easyocr_reader = easyocr.Reader(safe_languages, gpu=False)
+                else:
+                    raise e
             logger.info("EasyOCR reader initialized (CPU mode)")
         except ImportError:
             error = "EasyOCR not installed. Run: pip install easyocr"
