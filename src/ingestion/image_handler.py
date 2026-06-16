@@ -87,23 +87,44 @@ class ImageHandler:
         """Initialize EasyOCR reader for configured languages."""
         try:
             import easyocr
-            logger.info("Initializing EasyOCR reader for languages: {}...".format(self.languages))
-            try:
-                self.easyocr_reader = easyocr.Reader(self.languages, gpu=False)
-            except Exception as e:
-                # EasyOCR does not allow mixing Tamil ('ta') script with Devanagari/Telugu/Bengali.
-                # If a compatibility exception occurs, fall back to initializing without Tamil.
-                if "Tamil" in str(e) or "compatibility" in str(e).lower():
-                    safe_languages = [lang for lang in self.languages if lang != "ta"]
-                    logger.warning(
-                        "EasyOCR script compatibility warning. Retrying with safe languages (excluding Tamil): {}".format(
-                            safe_languages
+            current_langs = list(self.languages)
+            
+            while True:
+                try:
+                    logger.info("Initializing EasyOCR reader for languages: {}...".format(current_langs))
+                    self.easyocr_reader = easyocr.Reader(current_langs, gpu=False)
+                    logger.info("EasyOCR reader initialized (CPU mode)")
+                    break
+                except Exception as e:
+                    err_msg = str(e)
+                    offending_lang = None
+                    
+                    # Detect which language is causing the script compatibility warning
+                    for name, code in [
+                        ("telugu", "te"),
+                        ("tamil", "ta"),
+                        ("bengali", "bn"),
+                        ("devanagari", "hi"),
+                        ("marathi", "mr")
+                    ]:
+                        if name in err_msg.lower() and code in current_langs:
+                            offending_lang = code
+                            break
+                    
+                    if offending_lang:
+                        logger.warning(
+                            "EasyOCR compatibility warning: '{}'. Removing it and retrying...".format(offending_lang)
                         )
-                    )
-                    self.easyocr_reader = easyocr.Reader(safe_languages, gpu=False)
-                else:
-                    raise e
-            logger.info("EasyOCR reader initialized (CPU mode)")
+                        current_langs.remove(offending_lang)
+                        if not current_langs:
+                            current_langs = ["en"]
+                    else:
+                        # Fallback to English if the error message is unrecognizable
+                        logger.warning(
+                            "EasyOCR initialization failed: {}. Falling back to English only.".format(err_msg)
+                        )
+                        self.easyocr_reader = easyocr.Reader(["en"], gpu=False)
+                        break
         except ImportError:
             error = "EasyOCR not installed. Run: pip install easyocr"
             logger.error(error)
