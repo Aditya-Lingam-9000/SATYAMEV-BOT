@@ -10,6 +10,31 @@ pinned: false
 
 # 🛡️ Satyamev-Bot: Advanced Multimodal RAG-Driven Fact-Checking Engine
 
+<p align="center">
+  <a href="https://python.org">
+    <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  </a>
+  <a href="https://fastapi.tiangolo.com">
+    <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
+  </a>
+  <a href="https://langchain.com">
+    <img src="https://img.shields.io/badge/LangChain-1C3C3A?style=for-the-badge&logo=chainlink&logoColor=white" alt="LangChain" />
+  </a>
+  <a href="https://docker.com">
+    <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  </a>
+  <a href="https://huggingface.co/spaces">
+    <img src="https://img.shields.io/badge/Hugging%20Face-Spaces-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black" alt="Hugging Face" />
+  </a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Languages-10%20Indic%20+%20English-FF5722?style=flat-square" alt="Languages Supported" />
+  <img src="https://img.shields.io/badge/ASR-Whisper--large--v3--turbo-blueviolet?style=flat-square" alt="ASR" />
+  <img src="https://img.shields.io/badge/OCR-Gemini--Vision-blue?style=flat-square" alt="OCR" />
+  <img src="https://img.shields.io/badge/Deployment-Automated%20CI%2FCD-success?style=flat-square" alt="Deployment Status" />
+</p>
+
 Satyamev-Bot is a production-grade, CPU-optimized, multilingual fact-checking and automated counter-misinformation platform. Operating as an agentic assistant, the bot digests claim payloads across **Text**, **Image (OCR)**, and **Audio (Speech-to-Text)** modalities, queries global web consensus through real-time search, processes facts via a LangChain decision engine, and produces professionally formatted WhatsApp replies and shareable visual infographic cards.
 
 Designed for low-resource environments (such as free-tier CPU containers on Hugging Face Spaces), the engine routes intensive ML tasks to high-performance serverless endpoints (Google Gemini, Groq Whisper, and Groq Llama) while maintaining a lightweight local footprint.
