@@ -1,0 +1,11 @@
+.env
+venv/
+__pycache__/
+*.pyc
+temp/
+.gemini/
+logs/
+exports/
+test_output.txt
+ngrok.exe
+
