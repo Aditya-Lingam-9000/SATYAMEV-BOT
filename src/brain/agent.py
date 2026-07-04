@@ -2,7 +2,7 @@
 Fact-Checking Agent Implementation
 
 Core LangChain agent using ReAct (Reasoning + Acting) pattern.
-Uses Llama-3.3-70b (via Groq) or Gemini-1.5-Flash for reasoning
+Uses GPT-OSS-120B (via Groq) or Gemini-1.5-Flash for reasoning
 and Tavily API for real-time web search.
 
 Verdict Categories:
@@ -91,7 +91,7 @@ class FactCheckingAgent:
         
         Args:
             config: FactCheckingConfig instance (overrides strategy)
-            groq_api_key: Groq API key for Llama models
+            groq_api_key: Groq API key for GPT-OSS models
             google_api_key: Google API key for Gemini
             tavily_api_key: Tavily API key for web search
             strategy: Predefined config strategy ("fast", "balanced", "thorough")

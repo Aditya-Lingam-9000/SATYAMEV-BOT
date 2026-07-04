@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     # ============================================
     # LLM & AI MODEL APIs
     # ============================================
-    GROQ_API_KEY: str = Field(default="", description="Groq API key for Llama and Whisper models")
+    GROQ_API_KEY: str = Field(default="", description="Groq API key for GPT-OSS and Whisper models")
     GOOGLE_API_KEY: str = Field(default="", description="Google Generative AI API key")
     TAVILY_API_KEY: str = Field(default="", description="Tavily Search API key")
 

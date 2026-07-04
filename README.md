@@ -37,7 +37,7 @@ pinned: false
 
 Satyamev-Bot is a production-grade, CPU-optimized, multilingual fact-checking and automated counter-misinformation platform. Operating as an agentic assistant, the bot digests claim payloads across **Text**, **Image (OCR)**, and **Audio (Speech-to-Text)** modalities, queries global web consensus through real-time search, processes facts via a LangChain decision engine, and produces professionally formatted WhatsApp replies and shareable visual infographic cards.
 
-Designed for low-resource environments (such as free-tier CPU containers on Hugging Face Spaces), the engine routes intensive ML tasks to high-performance serverless endpoints (Google Gemini, Groq Whisper, and Groq Llama) while maintaining a lightweight local footprint.
+Designed for low-resource environments (such as free-tier CPU containers on Hugging Face Spaces), the engine routes intensive ML tasks to high-performance serverless endpoints (Google Gemini, Groq Whisper, and Groq GPT-OSS) while maintaining a lightweight local footprint.
 
 ---
 
@@ -72,7 +72,7 @@ flowchart TD
         QueryTrans --> Search["Tavily Web Search Tool"]
         Search --> WebConsensus["Real-Time Web Search Results"]
         
-        WebConsensus --> Reasoning["Llama-3.3-70b/Gemini-2.5-Flash\n(Joint Context Synthesis)"]
+        WebConsensus --> Reasoning["GPT-OSS-120B/Gemini-2.5-Flash\n(Joint Context Synthesis)"]
         Reasoning --> JSONOutput["Structured Verification JSON\n(Verdict, Reasoning, Sources)"]
     end
 
@@ -116,7 +116,7 @@ Satyamev-Bot provides production-ready, localized processing and response format
 
 ### The Multilingual Pipeline Workflow
 
-1. **Language Identification**: The decision engine triggers a prompt against `gemini-2.5-flash` or `llama-3.3-70b` to detect the language of the ingested claim.
+1. **Language Identification**: The decision engine triggers a prompt against `gemini-2.5-flash` or `openai/gpt-oss-120b` to detect the language of the ingested claim.
 2. **Cross-Lingual Search (Query Translation)**: Regional languages are translated into English search queries. This ensures the Tavily search engine pulls from the highest-index global databases and local Indian fact-checking platforms (like AltNews, BoomLive, PIB FactCheck).
 3. **Consensus Aggregation**: The agent reasons over retrieved English resources, synthesizing the truth value (Verdict: `TRUE`, `FALSE`, `MISLEADING`, or `UNVERIFIABLE`).
 4. **Target Script Rendering**: The agent translates the explanation and key evidence back into the detected regional script.
@@ -260,7 +260,7 @@ Follow these instructions to set up, configure, and execute the Satyamev-Bot loc
 
 *   Python 3.10 or 3.11 installed.
 *   External API accounts and API keys:
-    *   **Groq API Key**: For Whisper STT and Llama reasoning models.
+    *   **Groq API Key**: For Whisper STT and GPT-OSS reasoning models.
     *   **Google Gemini API Key**: For Vision OCR and fallback LLM reasoning.
     *   **Tavily API Key**: For web search indexing.
 

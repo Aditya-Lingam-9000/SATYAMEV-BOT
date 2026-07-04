@@ -18,12 +18,12 @@ class FactCheckingConfig(BaseModel):
     # LLM Provider Selection
     llm_provider: Literal["groq", "google"] = Field(
         default="groq",
-        description="Primary LLM provider (Groq for Llama, Google for Gemini)"
+        description="Primary LLM provider (Groq for GPT-OSS, Google for Gemini)"
     )
     
     # Model Names
     groq_model: str = Field(
-        default="llama-3.3-70b-versatile",
+        default="openai/gpt-oss-120b",
         description="Groq model for reasoning"
     )
     google_model: str = Field(
@@ -105,7 +105,7 @@ class FactCheckingConfig(BaseModel):
         json_schema_extra = {
             "example": {
                 "llm_provider": "groq",
-                "groq_model": "llama-3.3-70b-versatile",
+                "groq_model": "openai/gpt-oss-120b",
                 "reasoning_temperature": 0.1,
                 "max_iterations": 10,
                 "search_depth": 3,
