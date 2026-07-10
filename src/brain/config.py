@@ -27,7 +27,7 @@ class FactCheckingConfig(BaseModel):
         description="Groq model for reasoning"
     )
     google_model: str = Field(
-        default="gemini-2.5-flash",
+        default="gemini-1.5-flash",
         description="Google model for fallback/multimodal"
     )
     

@@ -266,7 +266,7 @@ class ImageHandler:
             mime_type = mime_type_map.get(ext, "image/jpeg")
             
             # Call Gemini Vision API
-            model = self.gemini_client.GenerativeModel('gemini-2.5-flash')
+            model = self.gemini_client.GenerativeModel('gemini-1.5-flash')
             message = model.generate_content([
                 {
                     "role": "user",
