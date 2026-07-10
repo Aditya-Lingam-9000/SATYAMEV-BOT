@@ -424,7 +424,7 @@ Respond ONLY with valid JSON, no other text."""
         
         except Exception as e:
             logger.error(f"Failed to parse verdict response: {str(e)}")
-            logger.debug(f"Response text: {response_text}")
+            logger.error(f"Raw Response text: {repr(response_text)}")
             
             # Return unverifiable as fallback
             return VerdictResult(
