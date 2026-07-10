@@ -68,42 +68,56 @@ class WebSearchTool:
         Returns:
             Tuple: (success: bool, results: Optional[List[SearchResult]], error: Optional[str])
         """
-        try:
-            # Truncate query if it exceeds 390 characters to avoid Tavily API constraints
-            if len(query) > 390:
-                query = query[:390]
-                logger.warning(f"[WebSearchTool] Query truncated to 390 characters: {query}")
-                
-            logger.info(f"[WebSearchTool] Searching: {query}")
-            
-            response = self.client.search(
-                query=query,
-                topic=topic,
-                max_results=self.max_results,
-                include_answer=include_answer
-            )
-            
-            results = []
-            
-            # Extract search results
-            if "results" in response:
-                for item in response["results"]:
-                    result = SearchResult(
-                        title=item.get("title", "N/A"),
-                        url=item.get("url", ""),
-                        snippet=item.get("content", ""),
-                        relevance_score=0.5  # Tavily doesn't return scores
-                    )
-                    results.append(result)
-                    logger.debug(f"  - Found: {result.title} ({result.url})")
-            
-            logger.info(f"[WebSearchTool] Found {len(results)} results")
-            return True, results, None
+        import time
+        max_retries = 3
+        backoff_factor = 2
+        last_exception = None
         
-        except Exception as e:
-            error_msg = f"Web search failed: {str(e)}"
-            logger.error(f"[WebSearchTool] {error_msg}")
-            return False, None, error_msg
+        # Truncate query if it exceeds 390 characters to avoid Tavily API constraints
+        if len(query) > 390:
+            query = query[:390]
+            logger.warning(f"[WebSearchTool] Query truncated to 390 characters: {query}")
+            
+        logger.info(f"[WebSearchTool] Searching: {query}")
+        
+        for attempt in range(max_retries):
+            try:
+                response = self.client.search(
+                    query=query,
+                    topic=topic,
+                    max_results=self.max_results,
+                    include_answer=include_answer
+                )
+                
+                results = []
+                
+                # Extract search results
+                if "results" in response:
+                    for item in response["results"]:
+                        result = SearchResult(
+                            title=item.get("title", "N/A"),
+                            url=item.get("url", ""),
+                            snippet=item.get("content", ""),
+                            relevance_score=0.5  # Tavily doesn't return scores
+                        )
+                        results.append(result)
+                        logger.debug(f"  - Found: {result.title} ({result.url})")
+                
+                logger.info(f"[WebSearchTool] Found {len(results)} results")
+                return True, results, None
+                
+            except Exception as e:
+                last_exception = e
+                wait_time = backoff_factor ** attempt
+                logger.warning(
+                    f"[WebSearchTool] Attempt {attempt + 1}/{max_retries} failed: {str(e)}. "
+                    f"Retrying in {wait_time}s..."
+                )
+                time.sleep(wait_time)
+                
+        error_msg = f"Web search failed after {max_retries} attempts: {str(last_exception)}"
+        logger.error(f"[WebSearchTool] {error_msg}")
+        return False, None, error_msg
     
     def search_claim_evidence(self, claim: str) -> Dict[str, Any]:
         """
