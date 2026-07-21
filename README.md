@@ -35,9 +35,16 @@ pinned: false
   <img src="https://img.shields.io/badge/Deployment-Automated%20CI%2FCD-success?style=flat-square" alt="Deployment Status" />
 </p>
 
-Satyamev-Bot is a production-grade, CPU-optimized, multilingual fact-checking and automated counter-misinformation platform. Operating as an agentic assistant, the bot digests claim payloads across **Text**, **Image (OCR)**, and **Audio (Speech-to-Text)** modalities, queries global web consensus through real-time search, processes facts via a LangChain decision engine, and produces professionally formatted WhatsApp replies and shareable visual infographic cards.
+Satyamev-Bot is a production-grade, CPU-optimized, multilingual fact-checking and automated counter-misinformation platform built directly into WhatsApp.
 
-Designed for low-resource environments (such as free-tier CPU containers on Hugging Face Spaces), the engine routes intensive ML tasks to high-performance serverless endpoints (Google Gemini, Groq Whisper, and Groq GPT-OSS) while maintaining a lightweight local footprint.
+### 🌍 1. Social Impact (The Problem & Beneficiaries)
+Over 90% of India's internet users communicate in regional languages, yet almost all professional fact-checking tools are English-centric and built for web browsers. This leaves rural communities highly vulnerable to viral WhatsApp scams, fake government schemes, and financial fraud. Satyamev-Bot bridges this digital language divide by bringing automated, real-time fact-checking directly to where the rumors live: inside WhatsApp. Our primary beneficiaries are non-English speaking internet users who are often the primary targets of sophisticated misinformation campaigns.
+
+### 💡 2. Innovation (Originality & Creativity)
+Unlike traditional web-based fact-checkers that require users to proactively search for truth, Satyamev-Bot operates as a frictionless, multimodal agent. A user simply forwards a suspicious text message, a screenshot, or a regional voice note. The bot digests these payloads across **Text**, **Image (OCR via Gemini Vision)**, and **Audio (ASR via Groq Whisper)** modalities. It then queries global web consensus through real-time RAG search, processes facts via a LangChain decision engine using GPT-OSS-120B, and produces professionally formatted replies and shareable visual infographic cards translated into the user's native language. 
+
+### ⚙️ 3. Feasibility (Practicality & Business Model)
+Satyamev-Bot is designed for extreme scalability and low-resource environments. By routing intensive ML tasks to high-performance serverless endpoints (Google Gemini, Groq Whisper, and Groq GPT-OSS), the core engine maintains a lightweight local footprint that can run on free-tier CPU containers (like Hugging Face Spaces). The business model leverages enterprise B2B partnerships with social media platforms and news agencies for API access, while remaining free for the end-user via WhatsApp Business API, ensuring long-term sustainability and mass adoption.
 
 ---
 
