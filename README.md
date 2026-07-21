@@ -37,18 +37,8 @@ pinned: false
 
 Satyamev-Bot is a production-grade, CPU-optimized, multilingual fact-checking and automated counter-misinformation platform built directly into WhatsApp.
 
-### 🌍 1. Social Impact (The Problem & Beneficiaries)
-Over 90% of India's internet users communicate in regional languages, yet almost all professional fact-checking tools are English-centric and built for web browsers. This leaves rural populations and non-formally educated individuals highly vulnerable to viral WhatsApp scams, fake government schemes, and financial fraud. Satyamev-Bot bridges this digital language divide by bringing automated, real-time fact-checking directly to where the rumors live: inside WhatsApp. By delivering verified results entirely in their local language, our primary beneficiaries are those who have historically been excluded from digital literacy tools, protecting them from sophisticated misinformation campaigns.
 
-### 💡 2. Innovation (Originality & Creativity)
-Unlike traditional web-based fact-checkers that require users to proactively navigate browsers and search for truth, Satyamev-Bot operates as a completely frictionless, multimodal agent. **It requires zero technical literacy to use: a user simply forwards a suspicious text message, a screenshot, or a regional voice note directly within WhatsApp.** The bot digests these payloads across **Text**, **Image (OCR via Gemini Vision)**, and **Audio (ASR via Groq Whisper)** modalities. It then queries global web consensus through real-time RAG search, processes facts via a LangChain decision engine using GPT-OSS-120B, and produces professionally formatted replies and shareable visual infographic cards seamlessly translated into the user's native language. 
-
-### ⚙️ 3. Feasibility (Practicality & Business Model)
-Satyamev-Bot is designed for extreme scalability and low-resource environments. By routing intensive ML tasks to high-performance serverless endpoints (Google Gemini, Groq Whisper, and Groq GPT-OSS), the core engine maintains a lightweight local footprint that can run on free-tier CPU containers (like Hugging Face Spaces). The business model leverages enterprise B2B partnerships with social media platforms and news agencies for API access, while remaining free for the end-user via WhatsApp Business API, ensuring long-term sustainability and mass adoption.
-
----
-
-## 🎯 2. Problem Statement: Misinformation in India
+## Problem Statement: Misinformation in India
 *   **The Scale of the Crisis**: India represents one of the largest messaging app markets in the world, with over 500 million active users on WhatsApp. However, the democratization of internet access has outpaced digital literacy, leading to the rapid and unchecked spread of fake news, viral scams, medical hoaxes, and phishing attempts.
 *   **The Language Barrier**: The vast majority of fact-checking portals operate predominantly in English, whereas the most dangerous rumors circulate in regional Indic languages. Rural and semi-urban populations face a severe lack of immediate, accessible resources to verify information in their mother tongues.
 *   **Multi-Modal Spread**: Misinformation is rarely just plain text. It is frequently propagated through manipulated image posters (such as fake government schemes) and viral audio voice notes (which bypass text-based monitoring systems entirely).
@@ -56,11 +46,22 @@ Satyamev-Bot is designed for extreme scalability and low-resource environments. 
 
 ---
 
-## 🚀 3. Key Product Pillars & Core Features
+### 1. Social Impact (The Problem & Beneficiaries)
+Over 90% of India's internet users communicate in regional languages, yet almost all professional fact-checking tools are English-centric and built for web browsers. This leaves rural populations and non-formally educated individuals highly vulnerable to viral WhatsApp scams, fake government schemes, and financial fraud. Satyamev-Bot bridges this digital language divide by bringing automated, real-time fact-checking directly to where the rumors live: inside WhatsApp. By delivering verified results entirely in their local language, our primary beneficiaries are those who have historically been excluded from digital literacy tools, protecting them from sophisticated misinformation campaigns.
+
+### 2. Innovation (Originality & Creativity)
+Unlike traditional web-based fact-checkers that require users to proactively navigate browsers and search for truth, Satyamev-Bot operates as a completely frictionless, multimodal agent. **It requires zero technical literacy to use: a user simply forwards a suspicious text message, a screenshot, or a regional voice note directly within WhatsApp.** The bot digests these payloads across **Text**, **Image (OCR via Gemini Vision)**, and **Audio (ASR via Groq Whisper)** modalities. It then queries global web consensus through real-time RAG search, processes facts via a LangChain decision engine using GPT-OSS-120B, and produces professionally formatted replies and shareable visual infographic cards seamlessly translated into the user's native language. 
+
+### 3. Feasibility (Practicality & Business Model)
+Satyamev-Bot is designed for extreme scalability and low-resource environments. By routing intensive ML tasks to high-performance serverless endpoints (Google Gemini, Groq Whisper, and Groq GPT-OSS), the core engine maintains a lightweight local footprint that can run on free-tier CPU containers (like Hugging Face Spaces). The business model leverages enterprise B2B partnerships with social media platforms and news agencies for API access, while remaining free for the end-user via WhatsApp Business API, ensuring long-term sustainability and mass adoption.
+
+
+
+## Key Product Pillars & Core Features
 Satyamev-Bot is built upon four foundational pillars:
 
 ### A. Comprehensive Multilingual Architecture
-The assistant provides end-to-end support for **10 major Indic languages**:
+The assistant provides end-to-end support for **10+ major Indic languages**:
 *   *Hindi, Telugu, Kannada, Tamil, Malayalam, Marathi, Bengali, Gujarati, Punjabi, and Odia.*
 *   The system dynamically detects the language of the incoming claim, aligns the internal search query and reasoning logic, and compiles the final verdict card in the exact language the user used.
 
