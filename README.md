@@ -48,6 +48,43 @@ Satyamev-Bot is designed for extreme scalability and low-resource environments. 
 
 ---
 
+## 🎯 2. Problem Statement: Misinformation in India
+*   **The Scale of the Crisis**: India represents one of the largest messaging app markets in the world, with over 500 million active users on WhatsApp. However, the democratization of internet access has outpaced digital literacy, leading to the rapid and unchecked spread of fake news, viral scams, medical hoaxes, and phishing attempts.
+*   **The Language Barrier**: The vast majority of fact-checking portals operate predominantly in English, whereas the most dangerous rumors circulate in regional Indic languages. Rural and semi-urban populations face a severe lack of immediate, accessible resources to verify information in their mother tongues.
+*   **Multi-Modal Spread**: Misinformation is rarely just plain text. It is frequently propagated through manipulated image posters (such as fake government schemes) and viral audio voice notes (which bypass text-based monitoring systems entirely).
+*   **Friction in Verification**: Expecting a user to exit their chat app, open a browser, search across search engines, and evaluate sources creates high friction. Verification must happen directly inside the messaging interface where the rumor was received.
+
+---
+
+## 🚀 3. Key Product Pillars & Core Features
+Satyamev-Bot is built upon four foundational pillars:
+
+### A. Comprehensive Multilingual Architecture
+The assistant provides end-to-end support for **10 major Indic languages**:
+*   *Hindi, Telugu, Kannada, Tamil, Malayalam, Marathi, Bengali, Gujarati, Punjabi, and Odia.*
+*   The system dynamically detects the language of the incoming claim, aligns the internal search query and reasoning logic, and compiles the final verdict card in the exact language the user used.
+
+### B. Multi-Modal Ingestion Pipeline
+The bot accepts three input modalities:
+1.  **Text Claims**: Direct questions, copied WhatsApp forwards, or viral statements.
+2.  **Image Claims**: Screen captures of social media posts, news headlines, or infographic posters. The bot performs Optical Character Recognition (OCR) to extract embedded text.
+3.  **Audio Claims**: Voice notes and spoken audio files. The bot performs Automatic Speech Recognition (ASR) to transcribe spoken words into structured text before processing.
+
+### C. Premium User Experience (UX)
+*   **Instant Acknowledgment**: WhatsApp webhooks require immediate responses to prevent network timeouts. The bot immediately responds with a friendly, localized acknowledgment to confirm receipt.
+*   **Native Typing Indicators**: To reduce perceived wait time while the AI agent performs real-time search queries and synthesis, the bot triggers the native WhatsApp "typing..." status indicator. This gives users immediate, visual feedback that their request is actively being processed.
+*   **No Notification Flooding**: Instead of sending multiple separate status messages that ping the user's phone repeatedly, the bot uses native typing indicators to preserve a clean, quiet chat thread.
+
+### D. High-Scannability Verdict Cards
+The output is returned in a standardized, premium text card optimized for WhatsApp screen dimensions:
+*   **Clear Verdict Label**: Bold, uppercase classification (e.g., `❌ VERDICT: FALSE`, `⚠️ VERDICT: MISLEADING`, `✅ VERDICT: TRUE`).
+*   **Confidence Score**: A precise percentage representing the system's evaluation of the supporting evidence.
+*   **Scannable Analysis**: A brief, emoji-free summary of why the claim is true or false.
+*   **Supporting Evidence**: Up to 5 bulleted points summarizing findings.
+*   **Verified Sources**: A clear, vertical list displaying trusted domains and raw hyperlinks on separate lines for easy readability and direct clicking.
+
+---
+
 ## 🗺️ Architectural Topology & Flow
 
 ```mermaid
