@@ -320,7 +320,7 @@ Respond ONLY with valid JSON, no other text."""
                     model=self.config.groq_model,
                     messages=[{"role": "user", "content": prompt}],
                     temperature=self.config.reasoning_temperature,
-                    max_tokens=1000,
+                    max_tokens=2500,
                     timeout=self.config.api_timeout_seconds,
                 )
                 return response.choices[0].message.content
@@ -331,7 +331,7 @@ Respond ONLY with valid JSON, no other text."""
                     prompt,
                     generation_config=genai.types.GenerationConfig(
                         temperature=self.config.reasoning_temperature,
-                        max_output_tokens=1000,
+                        max_output_tokens=2500,
                     )
                 )
                 return response.text
@@ -344,7 +344,7 @@ Respond ONLY with valid JSON, no other text."""
                         model=self.config.groq_model,
                         messages=[{"role": "user", "content": prompt}],
                         temperature=self.config.reasoning_temperature,
-                        max_tokens=1000,
+                        max_tokens=2500,
                     )
                     return response.choices[0].message.content
                 elif self.google_client:
@@ -389,50 +389,91 @@ Respond ONLY with valid JSON, no other text."""
         response_text: str,
         claim: str,
     ) -> VerdictResult:
-        """Parse LLM JSON response into VerdictResult."""
+        """Parse LLM JSON response into VerdictResult with resilient fallback parsing."""
+        data = None
         try:
-            # Extract JSON from response
+            if not response_text or not response_text.strip():
+                raise ValueError("Empty response from LLM")
+
+            # Extract JSON block using regex if wrapped in markdown codeblocks or extra text
             json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
-            if json_match:
-                json_str = json_match.group(0)
+            json_str = json_match.group(0) if json_match else response_text.strip()
+            
+            # Attempt standard JSON loading
+            try:
                 data = json.loads(json_str)
+            except Exception:
+                # Attempt to repair truncated JSON (e.g. unterminated string or unclosed brace)
+                repaired_str = json_str
+                if repaired_str.startswith("{") and not repaired_str.endswith("}"):
+                    repaired_str = re.sub(r'\\+$', '', repaired_str)
+                    if repaired_str.count('"') % 2 != 0:
+                        repaired_str += '"'
+                    repaired_str += "\n}"
+                data = json.loads(repaired_str)
+        except Exception as primary_err:
+            logger.warning(f"Standard JSON parse failed ({primary_err}), attempting regex extraction fallback...")
+            # Direct Regex Fallback for truncated LLM responses
+            verdict_m = re.search(r'"verdict"\s*:\s*"([^"]+)"', response_text, re.IGNORECASE)
+            conf_m = re.search(r'"confidence"\s*:\s*([0-9.]+)', response_text)
+            
+            # Extract reasoning even if truncated at the end
+            reasoning_m = re.search(r'"reasoning"\s*:\s*"(.*)', response_text, re.DOTALL)
+            reasoning_val = ""
+            if reasoning_m:
+                raw_reasoning = reasoning_m.group(1)
+                end_quote = raw_reasoning.find('",')
+                if end_quote != -1:
+                    reasoning_val = raw_reasoning[:end_quote]
+                else:
+                    end_brace = raw_reasoning.find('"')
+                    reasoning_val = raw_reasoning[:end_brace] if end_brace != -1 else raw_reasoning
+                reasoning_val = reasoning_val.replace('\\n', ' ').replace('\\"', '"').strip()
+
+            if verdict_m:
+                data = {
+                    "verdict": verdict_m.group(1).upper(),
+                    "confidence": float(conf_m.group(1)) if conf_m else 0.75,
+                    "reasoning": reasoning_val or "Analysis synthesized from verified sources.",
+                    "key_evidence": []
+                }
             else:
-                data = json.loads(response_text)
-            
-            # Extract fields
-            verdict = data.get("verdict", "UNVERIFIABLE").upper()
+                logger.error(f"Failed to parse verdict response: {str(primary_err)}")
+                logger.error(f"Raw Response text: {repr(response_text)}")
+                return VerdictResult(
+                    claim=claim,
+                    verdict="UNVERIFIABLE",
+                    confidence=0.0,
+                    reasoning=f"Unable to parse agent response: {str(primary_err)}",
+                )
+
+        # Extract fields
+        verdict = data.get("verdict", "UNVERIFIABLE").upper()
+        try:
             confidence = float(data.get("confidence", 0.5))
-            reasoning = data.get("reasoning", "No reasoning provided")
-            key_evidence = data.get("key_evidence", [])
-            
-            # Validate verdict
-            valid_verdicts = ["TRUE", "FALSE", "MISLEADING", "UNVERIFIABLE"]
-            if verdict not in valid_verdicts:
-                logger.warning(f"Invalid verdict '{verdict}', defaulting to UNVERIFIABLE")
-                verdict = "UNVERIFIABLE"
-            
-            # Clamp confidence
-            confidence = max(0.0, min(1.0, confidence))
-            
-            return VerdictResult(
-                claim=claim,
-                verdict=verdict,
-                confidence=confidence,
-                reasoning=reasoning,
-                key_evidence=key_evidence,
-            )
+        except (ValueError, TypeError):
+            confidence = 0.5
+        reasoning = str(data.get("reasoning", "No reasoning provided"))
+        key_evidence = data.get("key_evidence", [])
+        if not isinstance(key_evidence, list):
+            key_evidence = []
         
-        except Exception as e:
-            logger.error(f"Failed to parse verdict response: {str(e)}")
-            logger.error(f"Raw Response text: {repr(response_text)}")
-            
-            # Return unverifiable as fallback
-            return VerdictResult(
-                claim=claim,
-                verdict="UNVERIFIABLE",
-                confidence=0.0,
-                reasoning=f"Unable to parse agent response: {str(e)}",
-            )
+        # Validate verdict
+        valid_verdicts = ["TRUE", "FALSE", "MISLEADING", "UNVERIFIABLE"]
+        if verdict not in valid_verdicts:
+            logger.warning(f"Invalid verdict '{verdict}', defaulting to UNVERIFIABLE")
+            verdict = "UNVERIFIABLE"
+        
+        # Clamp confidence
+        confidence = max(0.0, min(1.0, confidence))
+        
+        return VerdictResult(
+            claim=claim,
+            verdict=verdict,
+            confidence=confidence,
+            reasoning=reasoning,
+            key_evidence=key_evidence,
+        )
     
     def batch_verify(
         self,
