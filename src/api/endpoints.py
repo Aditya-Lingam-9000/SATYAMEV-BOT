@@ -403,16 +403,11 @@ async def process_whatsapp_message(user_phone: str, message, whatsapp_handler, c
         # Process message through pipeline with status updates
         result = whatsapp_handler.process_message(message, status_callback=update_status)
         
-        # Format response
+        # Format response (WhatsAppFormatter guarantees clean formatting under 1500 chars)
         from src.whatsapp.formatter import WhatsAppFormatter
         response_text = WhatsAppFormatter.format_verdict_message(result)
         
-        # Ensure response text strictly adheres to Twilio's 1600 character limit
-        if len(response_text) > 1550:
-            logger.warning(f"Response text length ({len(response_text)}) exceeds safety threshold, trimming to 1540 chars")
-            response_text = response_text[:1540] + "..."
-
-        # Send response message with retry fallback for character limit errors
+        # Send response message with retry fallback
         try:
             message_sent = client.messages.create(
                 from_=twilio_phone,
@@ -423,8 +418,10 @@ async def process_whatsapp_message(user_phone: str, message, whatsapp_handler, c
         except Exception as send_err:
             err_str = str(send_err)
             if "1600" in err_str or "exceeds" in err_str.lower() or "limit" in err_str.lower():
-                logger.warning(f"Twilio 1600 char limit triggered on send ({err_str}), trimming and retrying...")
-                trimmed_text = response_text[:1400] + "\n\n[Full details trimmed due to size limit]"
+                logger.warning(f"Twilio 1600 char limit triggered on send ({err_str}), applying section-aware trim...")
+                # Cut at section boundary (newline) before 1400 chars to avoid breaking URLs
+                cut_idx = response_text[:1350].rfind("\n\n")
+                trimmed_text = response_text[:cut_idx if cut_idx > 300 else 1350] + "\n\n..."
                 message_sent = client.messages.create(
                     from_=twilio_phone,
                     body=trimmed_text,

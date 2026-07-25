@@ -284,7 +284,7 @@ class WhatsAppFormatter:
     def format_verdict_message(result: Dict) -> str:
         """
         Format verification result as WhatsApp message.
-        Professional, comprehensive formatting with strict length budget (< 1550 chars for Twilio limits).
+        Professional, clean formatting without decorative header bars and with complete, unbroken URLs.
         
         Args:
             result: Result dictionary from WhatsAppHandler.process_message()
@@ -311,21 +311,18 @@ class WhatsAppFormatter:
         sources = result.get("sources", [])
         key_evidence = result.get("key_evidence", [])
         
-        # Build message header
+        # Build message header (Clean header without bar borders)
         emoji = WhatsAppFormatter.VERDICT_EMOJI.get(verdict, "❓")
         verdict_trans_dict = WhatsAppFormatter.VERDICT_TRANSLATIONS.get(lang_key, WhatsAppFormatter.VERDICT_TRANSLATIONS["english"])
         translated_verdict = verdict_trans_dict.get(verdict, verdict)
         
+        confidence_bars = WhatsAppFormatter._get_confidence_bar(confidence)
+        
         header_lines = [
-            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
             f"{emoji} *{templates['verdict_title']}: {translated_verdict}*",
-            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+            f"*{templates['confidence']}:* {confidence_bars} {confidence:.0%}",
             "",
         ]
-        
-        confidence_bars = WhatsAppFormatter._get_confidence_bar(confidence)
-        header_lines.append(f"*{templates['confidence']}:* {confidence_bars} {confidence:.0%}")
-        header_lines.append("")
         
         footer_lines = [
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
@@ -333,43 +330,66 @@ class WhatsAppFormatter:
             f"_{templates['footer_sub']}_"
         ]
         
-        # Truncate reasoning if overly verbose to respect Twilio 1600 limit
-        max_reasoning_len = 500
-        if len(reasoning) > max_reasoning_len:
-            reasoning = reasoning[:max_reasoning_len].rstrip() + "..."
+        # Truncate reasoning at word boundary if needed
+        max_reasoning_len = 450
+        reasoning_clean = reasoning.strip()
+        if len(reasoning_clean) > max_reasoning_len:
+            cut_idx = reasoning_clean[:max_reasoning_len].rfind(" ")
+            if cut_idx > 200:
+                reasoning_clean = reasoning_clean[:cut_idx] + "..."
+            else:
+                reasoning_clean = reasoning_clean[:max_reasoning_len] + "..."
 
         body_lines = [
             f"*{templates['analysis'].upper()}*",
-            reasoning.strip(),
+            reasoning_clean,
             ""
         ]
         
         if key_evidence:
             body_lines.append(f"*{templates['supporting_evidence'].upper()}*")
-            for evidence in key_evidence[:3]:  # Limit to 3 bullets max
+            for evidence in key_evidence[:2]:  # Limit to 2 key evidence bullets max
                 ev_str = evidence.strip()
-                if len(ev_str) > 140:
-                    ev_str = ev_str[:137] + "..."
+                if len(ev_str) > 130:
+                    cut_idx = ev_str[:130].rfind(" ")
+                    ev_str = ev_str[:cut_idx] + "..." if cut_idx > 50 else ev_str[:130] + "..."
                 body_lines.append(f"• {ev_str}")
             body_lines.append("")
         
+        # Sources formatting: Clean domain header + full untouched URL below
+        # Limit to top 2 sources to guarantee complete URLs without character limit overflow
+        clean_sources = []
         if sources:
-            body_lines.append(f"*{templates['verified_sources'].upper()}*")
-            source_count = min(3, len(sources))  # Limit to top 3 sources max
-            reversed_sources = list(reversed(sources[:source_count]))
-            for i, source in enumerate(reversed_sources, 1):
-                domain = WhatsAppFormatter._extract_domain(source)
-                body_lines.append(f"{i}. {domain}")
-                body_lines.append(f"{source}")
-                if i < len(reversed_sources):
-                    body_lines.append("")
-            body_lines.append("")
+            clean_sources = [s.strip() for s in sources if isinstance(s, str) and s.strip().startswith("http")][:2]
+            if clean_sources:
+                body_lines.append(f"*{templates['verified_sources'].upper()}*")
+                for i, source_url in enumerate(clean_sources, 1):
+                    domain = WhatsAppFormatter._extract_domain(source_url)
+                    body_lines.append(f"{i}. {domain}")
+                    body_lines.append(source_url)
+                    if i < len(clean_sources):
+                        body_lines.append("")
+                body_lines.append("")
             
         full_message = "\n".join(header_lines + body_lines + footer_lines)
         
-        # Hard safety ceiling: Twilio WhatsApp limit is 1600 characters
-        if len(full_message) > 1550:
-            full_message = full_message[:1540] + "...\n\n" + "\n".join(footer_lines)
+        # Final safety check: if message exceeds 1500 chars, drop evidence section to keep full URLs intact
+        if len(full_message) > 1500 and key_evidence:
+            body_lines_no_ev = [
+                f"*{templates['analysis'].upper()}*",
+                reasoning_clean,
+                ""
+            ]
+            if clean_sources:
+                body_lines_no_ev.append(f"*{templates['verified_sources'].upper()}*")
+                for i, source_url in enumerate(clean_sources, 1):
+                    domain = WhatsAppFormatter._extract_domain(source_url)
+                    body_lines_no_ev.append(f"{i}. {domain}")
+                    body_lines_no_ev.append(source_url)
+                    if i < len(clean_sources):
+                        body_lines_no_ev.append("")
+                body_lines_no_ev.append("")
+            full_message = "\n".join(header_lines + body_lines_no_ev + footer_lines)
             
         return full_message
     
