@@ -284,7 +284,7 @@ class WhatsAppFormatter:
     def format_verdict_message(result: Dict) -> str:
         """
         Format verification result as WhatsApp message.
-        Professional, comprehensive formatting with medium-length analysis.
+        Professional, comprehensive formatting with strict length budget (< 1550 chars for Twilio limits).
         
         Args:
             result: Result dictionary from WhatsAppHandler.process_message()
@@ -311,58 +311,67 @@ class WhatsAppFormatter:
         sources = result.get("sources", [])
         key_evidence = result.get("key_evidence", [])
         
-        # Build message
+        # Build message header
         emoji = WhatsAppFormatter.VERDICT_EMOJI.get(verdict, "❓")
-        
-        # Translate the verdict category text
         verdict_trans_dict = WhatsAppFormatter.VERDICT_TRANSLATIONS.get(lang_key, WhatsAppFormatter.VERDICT_TRANSLATIONS["english"])
         translated_verdict = verdict_trans_dict.get(verdict, verdict)
         
-        message_lines = [
+        header_lines = [
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
             f"{emoji} *{templates['verdict_title']}: {translated_verdict}*",
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
             "",
         ]
         
-        # Confidence indicator
         confidence_bars = WhatsAppFormatter._get_confidence_bar(confidence)
-        message_lines.append(f"*{templates['confidence']}:* {confidence_bars} {confidence:.0%}")
-        message_lines.append("")
+        header_lines.append(f"*{templates['confidence']}:* {confidence_bars} {confidence:.0%}")
+        header_lines.append("")
         
-        # Detailed Reasoning (No programmatic truncation, print full LLM-controlled text)
-        message_lines.append(f"*{templates['analysis'].upper()}*")
-        message_lines.append(reasoning.strip())
-        message_lines.append("")
+        footer_lines = [
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+            f"_{templates['footer_title']}_",
+            f"_{templates['footer_sub']}_"
+        ]
         
-        # Key evidence (Clamped to 4-5 points max, bulleted)
+        # Truncate reasoning if overly verbose to respect Twilio 1600 limit
+        max_reasoning_len = 500
+        if len(reasoning) > max_reasoning_len:
+            reasoning = reasoning[:max_reasoning_len].rstrip() + "..."
+
+        body_lines = [
+            f"*{templates['analysis'].upper()}*",
+            reasoning.strip(),
+            ""
+        ]
+        
         if key_evidence:
-            message_lines.append(f"*{templates['supporting_evidence'].upper()}*")
-            # Display up to 5 evidence points max
-            for evidence in key_evidence[:5]:
-                message_lines.append(f"• {evidence.strip()}")
-            message_lines.append("")
+            body_lines.append(f"*{templates['supporting_evidence'].upper()}*")
+            for evidence in key_evidence[:3]:  # Limit to 3 bullets max
+                ev_str = evidence.strip()
+                if len(ev_str) > 140:
+                    ev_str = ev_str[:137] + "..."
+                body_lines.append(f"• {ev_str}")
+            body_lines.append("")
         
-        # Sources (Cleanly formatted with domain name on top and raw URL below it, in reverse relevance order)
         if sources:
-            message_lines.append(f"*{templates['verified_sources'].upper()}*")
-            source_count = min(4, len(sources))
-            # Reverse order so the most relevant (first) source is printed at the bottom
+            body_lines.append(f"*{templates['verified_sources'].upper()}*")
+            source_count = min(3, len(sources))  # Limit to top 3 sources max
             reversed_sources = list(reversed(sources[:source_count]))
             for i, source in enumerate(reversed_sources, 1):
                 domain = WhatsAppFormatter._extract_domain(source)
-                message_lines.append(f"{i}. {domain}")
-                message_lines.append(f"{source}")
+                body_lines.append(f"{i}. {domain}")
+                body_lines.append(f"{source}")
                 if i < len(reversed_sources):
-                    message_lines.append("")  # Blank line separator between sources
-            message_lines.append("")
+                    body_lines.append("")
+            body_lines.append("")
+            
+        full_message = "\n".join(header_lines + body_lines + footer_lines)
         
-        # Professional footer
-        message_lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        message_lines.append(f"_{templates['footer_title']}_")
-        message_lines.append(f"_{templates['footer_sub']}_")
-        
-        return "\n".join(message_lines)
+        # Hard safety ceiling: Twilio WhatsApp limit is 1600 characters
+        if len(full_message) > 1550:
+            full_message = full_message[:1540] + "...\n\n" + "\n".join(footer_lines)
+            
+        return full_message
     
     @staticmethod
     def format_acknowledgment_message() -> str:

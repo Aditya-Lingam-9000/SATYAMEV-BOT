@@ -407,14 +407,32 @@ async def process_whatsapp_message(user_phone: str, message, whatsapp_handler, c
         from src.whatsapp.formatter import WhatsAppFormatter
         response_text = WhatsAppFormatter.format_verdict_message(result)
         
-        # Send response message
-        message_sent = client.messages.create(
-            from_=twilio_phone,
-            body=response_text,
-            to=user_phone,
-        )
-        
-        logger.info(f"Response sent to {user_phone}: {message_sent.sid}")
+        # Ensure response text strictly adheres to Twilio's 1600 character limit
+        if len(response_text) > 1550:
+            logger.warning(f"Response text length ({len(response_text)}) exceeds safety threshold, trimming to 1540 chars")
+            response_text = response_text[:1540] + "..."
+
+        # Send response message with retry fallback for character limit errors
+        try:
+            message_sent = client.messages.create(
+                from_=twilio_phone,
+                body=response_text,
+                to=user_phone,
+            )
+            logger.info(f"Response sent to {user_phone}: {message_sent.sid}")
+        except Exception as send_err:
+            err_str = str(send_err)
+            if "1600" in err_str or "exceeds" in err_str.lower() or "limit" in err_str.lower():
+                logger.warning(f"Twilio 1600 char limit triggered on send ({err_str}), trimming and retrying...")
+                trimmed_text = response_text[:1400] + "\n\n[Full details trimmed due to size limit]"
+                message_sent = client.messages.create(
+                    from_=twilio_phone,
+                    body=trimmed_text,
+                    to=user_phone,
+                )
+                logger.info(f"Trimmed response successfully sent to {user_phone}: {message_sent.sid}")
+            else:
+                raise send_err
         
         # Send card image if available (as separate message)
         if result.get("card_bytes"):
