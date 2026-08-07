@@ -51,13 +51,18 @@ class WebSearchTool:
             api_key: Tavily API key
             max_results: Maximum results per search (5-10 recommended)
         """
+        import requests
         if not api_key:
             raise ValueError("Tavily API key is required")
         
         self.client = TavilyClient(api_key=api_key)
         self.max_results = min(max(max_results, 1), 10)  # Clamp to 1-10
-        logger.info(f"WebSearchTool initialized with Parallel Multi-Engine search (max_results={self.max_results})")
-    
+        self.session = requests.Session()
+        self.session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        })
+        logger.info(f"WebSearchTool initialized with Parallel Multi-Engine search & HTTP pooling (max_results={self.max_results})")
+
     def search(
         self,
         query: str,
@@ -131,15 +136,13 @@ class WebSearchTool:
         """Fetch real-time news headlines via Google News RSS feed (No API Key required)."""
         import urllib.parse
         import xml.etree.ElementTree as ET
-        import requests
         
         results = []
         try:
             encoded_query = urllib.parse.quote(query[:300])
             rss_url = f"https://news.google.com/rss/search?q={encoded_query}&hl=en-IN&gl=IN&ceid=IN:en"
-            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
             
-            resp = requests.get(rss_url, headers=headers, timeout=4)
+            resp = self.session.get(rss_url, timeout=4)
             if resp.status_code == 200:
                 root = ET.fromstring(resp.content)
                 for item in root.findall("./channel/item")[:max_results]:
@@ -161,15 +164,13 @@ class WebSearchTool:
     def _search_wikipedia(self, query: str, max_results: int = 2) -> List[SearchResult]:
         """Fetch background facts via Wikipedia REST API (No API Key required)."""
         import urllib.parse
-        import requests
         
         results = []
         try:
             encoded_query = urllib.parse.quote(query[:300])
             wiki_url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={encoded_query}&format=json"
-            headers = {"User-Agent": "SatyamevBotFactChecker/1.0"}
             
-            resp = requests.get(wiki_url, headers=headers, timeout=4)
+            resp = self.session.get(wiki_url, timeout=4)
             if resp.status_code == 200:
                 data = resp.json()
                 search_items = data.get("query", {}).get("search", [])[:max_results]
@@ -193,7 +194,6 @@ class WebSearchTool:
         """Fetch web search results via DuckDuckGo (No API Key required)."""
         import urllib.parse
         import re
-        import requests
         
         results = []
         try:
@@ -215,8 +215,7 @@ class WebSearchTool:
                 
             encoded_query = urllib.parse.quote(query[:300])
             html_url = f"https://html.duckduckgo.com/html/?q={encoded_query}"
-            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-            resp = requests.get(html_url, headers=headers, timeout=4)
+            resp = self.session.get(html_url, timeout=4)
             if resp.status_code == 200:
                 matches = re.findall(r'<a class="result__url" href="([^"]+)".*?>(.*?)</a>', resp.text, re.DOTALL)
                 snippets = re.findall(r'<a class="result__snippet".*?>(.*?)</a>', resp.text, re.DOTALL)

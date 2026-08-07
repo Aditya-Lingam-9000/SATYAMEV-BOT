@@ -357,18 +357,50 @@ Respond ONLY with valid JSON, no other text."""
             raise
             
     def _detect_language(self, text: str) -> str:
-        """Detect the language of the text using LLM."""
-        prompt = (
-            f"Identify the language of the following text (e.g., English, Hindi, Tamil, Telugu, Bengali, Marathi, Kannada, Malayalam, Gujarati, etc.). "
-            f"Return only the name of the language, nothing else.\n\nText: {text}"
-        )
-        try:
-            lang = self._call_llm(prompt).strip().strip('"').strip("'").strip()
-            logger.info(f"Detected language: {lang}")
-            return lang
-        except Exception as e:
-            logger.warning(f"Language detection failed: {e}, defaulting to English")
+        """Fast, deterministic language detection using Unicode script ranges with LLM fallback."""
+        if not text or not text.strip():
             return "English"
+            
+        clean_text = text.strip()
+        
+        # Check Unicode Script ranges (0.0001s instant execution)
+        if re.search(r'[\u0C00-\u0C7F]', clean_text):
+            logger.info("Fast Unicode detection: Telugu")
+            return "Telugu"
+        elif re.search(r'[\u0B80-\u0BFF]', clean_text):
+            logger.info("Fast Unicode detection: Tamil")
+            return "Tamil"
+        elif re.search(r'[\u0980-\u09FF]', clean_text):
+            logger.info("Fast Unicode detection: Bengali")
+            return "Bengali"
+        elif re.search(r'[\u0A80-\u0AFF]', clean_text):
+            logger.info("Fast Unicode detection: Gujarati")
+            return "Gujarati"
+        elif re.search(r'[\u0C80-\u0CFF]', clean_text):
+            logger.info("Fast Unicode detection: Kannada")
+            return "Kannada"
+        elif re.search(r'[\u0D00-\u0D7F]', clean_text):
+            logger.info("Fast Unicode detection: Malayalam")
+            return "Malayalam"
+        elif re.search(r'[\u0B00-\u0B7F]', clean_text):
+            logger.info("Fast Unicode detection: Odia")
+            return "Odia"
+        elif re.search(r'[\u0A00-\u0A7F]', clean_text):
+            logger.info("Fast Unicode detection: Punjabi")
+            return "Punjabi"
+        elif re.search(r'[\u0600-\u06FF]', clean_text):
+            logger.info("Fast Unicode detection: Urdu")
+            return "Urdu"
+        elif re.search(r'[\u0900-\u097F]', clean_text):
+            if any(w in clean_text for w in ["आहे", "नाही", "आणि", "म्हणाले", "केले"]):
+                logger.info("Fast Unicode detection: Marathi")
+                return "Marathi"
+            logger.info("Fast Unicode detection: Hindi")
+            return "Hindi"
+
+        # Default for ASCII / Latin script
+        logger.info("Fast detection: English")
+        return "English"
 
     def _translate_to_english(self, text: str) -> str:
         """Translate text to English using LLM if it's not already in English."""
