@@ -275,7 +275,7 @@ class FactCheckingAgent:
         target_language: str = "English",
     ) -> str:
         """Construct prompt for LLM verdict generation."""
-        prompt = f"""You are an expert fact-checker. Analyze the following claim and evidence.
+        prompt = f"""You are an expert fact-checker specializing in detecting misinformation, fake government schemes, financial frauds, and phishing links. Analyze the following claim and evidence.
 
 CLAIM: {claim}
 
@@ -284,10 +284,10 @@ CLAIM: {claim}
 TASK: Determine if the claim is TRUE, FALSE, MISLEADING, or UNVERIFIABLE.
 
 INSTRUCTIONS:
-1. Analyze the evidence carefully
-2. Assess the credibility and relevance of sources
-3. Consider the claim's specificity and verifiability
-4. Provide a clear verdict with reasoning
+1. Analyze the evidence carefully. If the claim contains a web link or advertises a monetary scheme/giveaway/job offer, check domain authenticity (e.g. official .gov.in/.nic.in vs unofficial/scam domains like .xyz/.top/.site/unverified .com clones).
+2. If a scheme or offer is promoted via a non-official/third-party link, or is contradicted by official PIB Fact-Check / government sources, classify it clearly as FALSE or MISLEADING and warn the user.
+3. Assess the credibility and relevance of sources.
+4. Provide a clear verdict with reasoning.
 5. IMPORTANT: The "verdict" key value MUST be one of the English keys: "TRUE", "FALSE", "MISLEADING", or "UNVERIFIABLE".
 6. IMPORTANT: The "reasoning" and "key_evidence" text values MUST be written in the user's original language: {target_language}.
 7. IMPORTANT: The "reasoning" value MUST be a concise, complete analysis of exactly 3 to 4 sentences (~300 to 450 characters). The final sentence must be fully written out and end with a period. Do not truncate the output with dots.
@@ -302,9 +302,9 @@ REQUIRED RESPONSE FORMAT (JSON):
 }}
 
 DEFINITIONS:
-- TRUE: Claim is supported by credible evidence
-- FALSE: Claim is contradicted by credible evidence
-- MISLEADING: Claim is partially true or taken out of context
+- TRUE: Claim is supported by credible official evidence
+- FALSE: Claim is contradicted by credible evidence or is an unofficial/fake scheme or scam link
+- MISLEADING: Claim is partially true, misleadingly framed, or uses deceptive domains
 - UNVERIFIABLE: Insufficient evidence to verify
 
 Respond ONLY with valid JSON, no other text."""

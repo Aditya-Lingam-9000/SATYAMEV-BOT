@@ -132,16 +132,21 @@ class IngestionManager:
         # Step 2: Route to appropriate handler
         if input_type == IngestionType.TEXT:
             import re
-            is_url = bool(re.match(r'^(https?://|www\.)\S+$', source.strip(), re.IGNORECASE))
-            if is_url:
-                logger.info(f"Detected standalone URL input: {source.strip()}. Executing real-time page scraping...")
+            url_match = re.search(r'(https?://\S+|www\.\S+)', source.strip(), re.IGNORECASE)
+            if url_match:
+                raw_url = url_match.group(0)
+                logger.info(f"Detected link in message: {raw_url}. Executing real-time web page scraping...")
                 from .url_scraper import scrape_url_content
-                scrape_res = scrape_url_content(source.strip())
+                scrape_res = scrape_url_content(raw_url)
                 if scrape_res.get("success") and scrape_res.get("text"):
                     logger.info(f"Live URL scraping succeeded ({len(scrape_res['text'])} chars extracted)")
-                    return True, scrape_res["text"], None
+                    if source.strip() == raw_url:
+                        full_payload = scrape_res["text"]
+                    else:
+                        full_payload = f"User Message Claim: {source.strip()}\n\n[Scraped Link Content]\n{scrape_res['text']}"
+                    return True, full_payload, None
                 else:
-                    logger.warning(f"Live URL scraping failed ({scrape_res.get('error')}), using raw URL string")
+                    logger.warning(f"Live URL scraping failed ({scrape_res.get('error')}), using raw message text")
             
             logger.debug("Routing to text handler")
             success, text, error = self.text_handler.process(source, clean=clean)
