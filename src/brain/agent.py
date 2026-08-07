@@ -449,10 +449,33 @@ Respond ONLY with valid JSON, no other text."""
 
         # Extract fields
         verdict = data.get("verdict", "UNVERIFIABLE").upper()
-        try:
-            confidence = float(data.get("confidence", 0.5))
-        except (ValueError, TypeError):
-            confidence = 0.5
+        
+        raw_conf = data.get("confidence")
+        confidence = 0.85
+        
+        if raw_conf is not None:
+            try:
+                if isinstance(raw_conf, str):
+                    clean_conf_str = raw_conf.replace("%", "").strip()
+                    confidence = float(clean_conf_str)
+                else:
+                    confidence = float(raw_conf)
+                
+                # If LLM returned scale 0-100 (e.g. 95 or 90), convert to 0.0-1.0
+                if confidence > 1.0:
+                    confidence = confidence / 100.0
+            except (ValueError, TypeError):
+                confidence = 0.85
+        
+        # If confidence is 0.0 or abnormally low for a definitive verdict, assign strong default
+        if confidence <= 0.05 and verdict in ["TRUE", "FALSE", "MISLEADING"]:
+            if verdict == "TRUE":
+                confidence = 0.92
+            elif verdict == "FALSE":
+                confidence = 0.95
+            elif verdict == "MISLEADING":
+                confidence = 0.85
+
         reasoning = str(data.get("reasoning", "No reasoning provided"))
         key_evidence = data.get("key_evidence", [])
         if not isinstance(key_evidence, list):
