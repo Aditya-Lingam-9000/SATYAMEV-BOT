@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     LOG_FILE: str = Field(default="./logs/satyamev_bot.log", description="Log file path")
 
     # ============================================
-    # TWILIO WHATSAPP CONFIGURATION (Phase 5)
+    # TWILIO & WHAPI WHATSAPP CONFIGURATION
     # ============================================
     TWILIO_ACCOUNT_SID: Optional[str] = Field(default="", description="Twilio Account SID")
     TWILIO_AUTH_TOKEN: Optional[str] = Field(default="", description="Twilio Auth Token")
@@ -56,6 +56,7 @@ class Settings(BaseSettings):
         default="whatsapp:+14155238886",
         description="Twilio WhatsApp phone number"
     )
+    WHAPI_API_TOKEN: Optional[str] = Field(default="", description="Whapi.cloud Channel API Token")
     NGROK_URL: Optional[str] = Field(default="http://localhost:8000", description="Ngrok public URL")
 
     # ============================================

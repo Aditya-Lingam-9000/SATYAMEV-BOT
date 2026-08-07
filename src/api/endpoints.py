@@ -9,9 +9,11 @@ from typing import Optional
 from datetime import datetime
 import base64
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Form
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Form, Request
 from fastapi.responses import StreamingResponse
 import io
+import os
+import requests
 
 from .models import (
     HealthResponse,
@@ -337,7 +339,117 @@ def create_router() -> APIRouter:
             except:
                 raise HTTPException(status_code=500, detail="WhatsApp processing error")
 
+    @router.post("/v1/whapi")
+    async def whapi_webhook(
+        request: Request,
+        background_tasks: BackgroundTasks
+    ):
+        """
+        WhatsApp webhook endpoint for Whapi.Cloud integration.
+        Receives incoming messages from direct Indian (+91) phone numbers.
+        """
+        try:
+            payload = await request.json()
+            logger.info("Received Whapi webhook payload")
+            
+            messages = payload.get("messages", [])
+            if not messages:
+                return {"status": "ok", "message": "no messages"}
+                
+            from src.config import Settings
+            config = Settings()
+            whapi_token = config.WHAPI_API_TOKEN or os.getenv("WHAPI_API_TOKEN", "")
+            
+            from src.whatsapp.handler import WhatsAppHandler, WhatsAppMessage
+            whatsapp_handler = WhatsAppHandler(
+                ingestion_manager=ingestion_manager,
+                fact_checking_agent=fact_checking_agent,
+                card_generator=card_generator,
+            )
+            
+            for msg_item in messages:
+                # Ignore outgoing messages sent by the bot
+                if msg_item.get("from_me"):
+                    continue
+                    
+                raw_sender = msg_item.get("from", "")
+                sender_id = raw_sender.split("@")[0].strip() if "@" in raw_sender else raw_sender.strip()
+                if not sender_id:
+                    continue
+                    
+                msg_type = msg_item.get("type", "text")
+                body = ""
+                media_url = None
+                media_type = None
+                
+                if msg_type == "text":
+                    body = msg_item.get("text", {}).get("body", "")
+                elif msg_type == "image":
+                    body = msg_item.get("caption", "") or msg_item.get("image", {}).get("caption", "")
+                    media_url = msg_item.get("image", {}).get("link", "")
+                    media_type = "image"
+                elif msg_type in ["voice", "audio"]:
+                    media_url = msg_item.get("voice", {}).get("link", "") or msg_item.get("audio", {}).get("link", "")
+                    media_type = "audio"
+                    
+                msg = WhatsAppMessage(
+                    user_phone=sender_id,
+                    message_body=body,
+                    media_url=media_url,
+                    media_type=media_type,
+                )
+                
+                # Send immediate acknowledgment back via Whapi API
+                if whapi_token:
+                    try:
+                        requests.post(
+                            "https://gate.whapi.cloud/messages/text",
+                            headers={"Authorization": f"Bearer {whapi_token}", "Content-Type": "application/json"},
+                            json={"to": f"{sender_id}@s.whatsapp.net", "body": "🔍 Satyamev-Bot is now verifying your claim. Please wait a moment..."},
+                            timeout=5
+                        )
+                    except Exception as ack_err:
+                        logger.warning(f"Failed to send Whapi ack: {ack_err}")
+                
+                # Schedule background processing
+                background_tasks.add_task(
+                    process_whapi_message,
+                    user_phone=sender_id,
+                    message=msg,
+                    whatsapp_handler=whatsapp_handler,
+                    whapi_token=whapi_token,
+                )
+                
+            return {"status": "ok", "processed": len(messages)}
+            
+        except Exception as e:
+            logger.error(f"Whapi webhook error: {str(e)}")
+            return {"status": "error", "error": str(e)}
+
     return router
+
+
+async def process_whapi_message(user_phone: str, message, whatsapp_handler, whapi_token: str):
+    """
+    Background task: Process Whapi message through pipeline and send verdict back.
+    """
+    try:
+        logger.info(f"Background Whapi processing started for {user_phone}")
+        result = whatsapp_handler.process_message(message)
+        
+        from src.whatsapp.formatter import WhatsAppFormatter
+        response_text = WhatsAppFormatter.format_verdict_message(result)
+        
+        if whapi_token:
+            resp = requests.post(
+                "https://gate.whapi.cloud/messages/text",
+                headers={"Authorization": f"Bearer {whapi_token}", "Content-Type": "application/json"},
+                json={"to": f"{user_phone}@s.whatsapp.net", "body": response_text},
+                timeout=10
+            )
+            logger.info(f"Whapi response sent to {user_phone}: HTTP {resp.status_code}")
+    except Exception as e:
+        logger.error(f"Whapi background processing error: {str(e)}")
 
 
 # Global reference to Twilio client for background task
