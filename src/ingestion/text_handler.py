@@ -67,7 +67,9 @@ class TextHandler:
             logger.warning(error)
             return False, error
         
-        if len(text) < self.min_length:
+        # Check if text is a raw URL
+        is_url = bool(re.match(r'^(https?://|www\.)\S+$', text.strip(), re.IGNORECASE))
+        if not is_url and len(text) < self.min_length:
             error = "Text too short: {} chars (minimum: {})".format(len(text), self.min_length)
             logger.warning(error)
             return False, error
@@ -109,7 +111,7 @@ class TextHandler:
     
     def clean(self, text: str) -> str:
         """
-        Deep clean: normalize + remove URLs, emails, special patterns.
+        Deep clean: normalize + remove emails and phone patterns while preserving raw URLs for analysis.
         
         Args:
             text: Text to clean
@@ -120,9 +122,6 @@ class TextHandler:
         # First normalize
         text = self.normalize(text)
         
-        # Remove URLs (http, https, ftp)
-        text = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '[URL]', text)
-        
         # Remove email addresses
         text = re.sub(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', '[EMAIL]', text)
         
@@ -132,12 +131,13 @@ class TextHandler:
         # Remove repeated punctuation (e.g., !!! -> !)
         text = re.sub(r'([!?.,-])\1{2,}', r'\1', text)
         
-        # Normalize punctuation spacing
-        text = re.sub(r'\s+([.,!?;:])', r'\1', text)
-        text = re.sub(r'([.,!?;:])\s*', r'\1 ', text)
+        # Normalize punctuation spacing (avoid breaking http:// or https://)
+        if not re.match(r'^(https?://|www\.)\S+$', text, re.IGNORECASE):
+            text = re.sub(r'\s+([.,!?;:])', r'\1', text)
+            text = re.sub(r'([.,!?;:])\s*', r'\1 ', text)
         text = re.sub(r'\s+', ' ', text).strip()
         
-        logger.debug("Text cleaned: removed URLs, emails, special patterns")
+        logger.debug("Text cleaned: preserved URLs, removed emails and phone patterns")
         return text
     
     def process(self, text: Optional[str], clean: bool = True) -> Tuple[bool, Optional[str], Optional[str]]:

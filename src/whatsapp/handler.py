@@ -261,7 +261,9 @@ class WhatsAppHandler:
                 logger.error(f"Ingestion failed: {error}")
                 return result
             
-            if not text or len(text) < 10:
+            import re
+            is_raw_url = bool(re.match(r'^(https?://|www\.)\S+$', text.strip(), re.IGNORECASE))
+            if not text or (len(text) < 10 and not is_raw_url):
                 result["error"] = "No valid text extracted from input (minimum 10 characters required)"
                 return result
             

@@ -8,4 +8,7 @@ logs/
 exports/
 test_output.txt
 ngrok.exe
-
+script_plan.md
+entire_script.md
+documentation.md
+assets/
